@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>detik AI — Wabah Campak 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e8192c;
+      --red-dark: #c0121f;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e8e8e8;
+      --bg: #f4f4f6;
+      --white: #ffffff;
+      --sidebar-w: 280px;
+      --panel-w: 272px;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 3px solid var(--red);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px;
+    }
+    .topbar .logo {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--red);
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .topbar .divider-v { width: 1px; height: 28px; background: var(--border); }
+    .topbar .ai-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .ai-label .badge {
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 2px 7px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+    }
+    .topbar .back-link {
+      margin-left: auto;
+      font-size: 13px;
+      color: var(--red);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .topbar .back-link:hover { text-decoration: underline; }
+
+    /* ── MAIN LAYOUT ── */
+    .chat-layout {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ── */
+    .chat-sidebar {
+      width: var(--sidebar-w);
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sidebar-head {
+      padding: 16px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .new-chat-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--red);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .new-chat-btn:hover { background: var(--red-dark); }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #555;
+      padding: 14px 16px 6px;
+    }
+    .chat-history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 8px 8px;
+      scrollbar-width: thin;
+      scrollbar-color: #333 transparent;
+    }
+    .history-item {
+      padding: 9px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: #aaa;
+      font-size: 12px;
+      line-height: 1.4;
+      transition: background 0.12s;
+    }
+    .history-item:hover { background: #252525; color: #fff; }
+    .history-item.active { background: #2a2a2a; color: #fff; }
+    .history-item .hi-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .history-item .hi-text { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .history-item .hi-time { font-size: 10px; color: #444; flex-shrink: 0; margin-top: 2px; }
+
+    .sidebar-topics {
+      border-top: 1px solid #2a2a2a;
+      padding: 12px 8px;
+    }
+    .topic-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #888;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+    }
+    .topic-chip:hover { background: #252525; color: #fff; }
+    .topic-chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── CHAT MAIN ── */
+    .chat-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* Chat header */
+    .chat-header {
+      padding: 14px 24px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .chat-header .ai-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .chat-header .ai-icon-wrap::after {
+      content: '';
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4ade80;
+      border: 2px solid var(--white);
+    }
+    .chat-header .info h2 { font-size: 15px; font-weight: 900; }
+    .chat-header .info p { font-size: 11px; color: var(--muted); }
+    .chat-header .actions { margin-left: auto; display: flex; gap: 8px; }
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 15px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .icon-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* Messages area */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: #ddd transparent;
+    }
+
+    /* Welcome state */
+    .chat-welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      text-align: center;
+      padding: 40px 24px;
+      gap: 16px;
+    }
+    .welcome-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(232,25,44,0.3);
+      margin-bottom: 8px;
+    }
+    .chat-welcome h2 { font-size: 22px; font-weight: 900; }
+    .chat-welcome p { font-size: 14px; color: var(--muted); max-width: 420px; line-height: 1.65; }
+    .starter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+      max-width: 520px;
+      margin-top: 12px;
+    }
+    .starter-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .starter-card:hover { border-color: var(--red); box-shadow: 0 2px 12px rgba(232,25,44,0.1); }
+    .starter-card .sc-icon { font-size: 20px; margin-bottom: 6px; }
+    .starter-card .sc-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .starter-card .sc-desc { font-size: 11px; color: var(--muted); line-height: 1.45; }
+
+    /* Message bubbles */
+    .msg-row {
+      display: flex;
+      gap: 10px;
+      max-width: 780px;
+      animation: msgSlide 0.2s ease both;
+    }
+    @keyframes msgSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-row.bot  { align-self: flex-start; }
+
+    .msg-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .msg-row.bot .msg-avatar { background: var(--red); }
+    .msg-row.user .msg-avatar { background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 700; }
+
+    .msg-content { display: flex; flex-direction: column; gap: 4px; }
+    .msg-sender { font-size: 11px; color: var(--muted); font-weight: 700; }
+    .msg-row.user .msg-sender { text-align: right; }
+
+    .msg-bubble {
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 580px;
+    }
+    .msg-row.bot .msg-bubble {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+      color: var(--text);
+    }
+    .msg-row.user .msg-bubble {
+      background: var(--red);
+      color: #fff;
+      border-top-right-radius: 4px;
+    }
+    .msg-bubble strong { font-weight: 700; }
+    .msg-bubble p { margin-bottom: 8px; }
+    .msg-bubble p:last-child { margin-bottom: 0; }
+    .msg-bubble ul { padding-left: 18px; margin: 6px 0; }
+    .msg-bubble li { margin-bottom: 4px; }
+
+    .msg-time { font-size: 10px; color: #ccc; margin-top: 2px; }
+    .msg-row.user .msg-time { text-align: right; color: #bbb; }
+
+    /* Source pills */
+    .msg-sources { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .source-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: #f0f0f4;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .source-pill:hover { background: #e8e8f0; color: var(--red); }
+    .source-pill .sp-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 16px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      border-top-left-radius: 4px;
+      width: fit-content;
+    }
+    .typing-indicator span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #ccc;
+      animation: typingDot 1.2s ease infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); background: #ccc; }
+      30% { transform: translateY(-5px); background: var(--red); }
+    }
+
+    /* ── INPUT AREA ── */
+    .chat-input-area {
+      padding: 16px 24px 20px;
+      background: var(--white);
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .chat-input-wrap {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    .input-row {
+      display: flex;
+      gap: 10px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 6px 6px 6px 16px;
+      transition: border-color 0.15s;
+    }
+    .input-row:focus-within { border-color: var(--red); }
+    #main-chat-input {
+      flex: 1;
+      border: none;
+      background: none;
+      outline: none;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      padding: 6px 0;
+      resize: none;
+      max-height: 120px;
+    }
+    #main-chat-input::placeholder { color: #aaa; }
+    .input-actions { display: flex; align-items: flex-end; gap: 6px; }
+    .input-action-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.12s;
+    }
+    .input-action-btn:hover { color: var(--red); }
+    #main-send-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--red);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+      flex-shrink: 0;
+    }
+    #main-send-btn:hover { background: var(--red-dark); }
+    #main-send-btn:active { transform: scale(0.95); }
+    #main-send-btn:disabled { background: #ddd; cursor: not-allowed; }
+
+    .input-hint {
+      font-size: 11px;
+      color: #bbb;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* Quick prompts bar */
+    .quick-prompts {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .qp-btn {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--muted);
+      transition: border-color 0.12s, color 0.12s;
+      white-space: nowrap;
+    }
+    .qp-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── RIGHT MEMORY PANEL ── */
+    .memory-panel {
+      width: var(--panel-w);
+      background: #0f0f13;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-left: 1px solid #1e1e28;
+      font-family: 'Lato', sans-serif;
+    }
+    .mp-header {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #1e1e28;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .mp-header .mp-title {
+      font-size: 11px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      flex: 1;
+    }
+    .mp-header .mp-live {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: #555;
+    }
+    .mp-header .mp-live::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4ade80;
+      animation: livepulse 1.8s ease infinite;
+    }
+    @keyframes livepulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .mp-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: #222 transparent;
+    }
+
+    /* Section block */
+    .mp-section {
+      background: #16161e;
+      border: 1px solid #1e1e2e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .mp-section-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-bottom: 1px solid #1e1e2e;
+      cursor: pointer;
+      user-select: none;
+    }
+    .mp-section-head .sec-icon {
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+    .mp-section-head .sec-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      flex: 1;
+    }
+    .mp-section-head .sec-count {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .mp-section-head .sec-toggle {
+      font-size: 10px;
+      color: #444;
+      transition: transform 0.2s;
+    }
+    .mp-section.collapsed .sec-toggle { transform: rotate(-90deg); }
+    .mp-section.collapsed .mp-section-body { display: none; }
+
+    .mp-section-body { padding: 8px 10px; }
+
+    /* User Memory */
+    .mp-section.user-mem .sec-icon { background: rgba(232,25,44,0.15); }
+    .mp-section.user-mem .sec-label { color: #e8192c; }
+    .mp-section.user-mem .sec-count { background: rgba(232,25,44,0.15); color: #e8192c; }
+
+    /* Session Memory */
+    .mp-section.session-mem .sec-icon { background: rgba(99,102,241,0.15); }
+    .mp-section.session-mem .sec-label { color: #818cf8; }
+    .mp-section.session-mem .sec-count { background: rgba(99,102,241,0.15); color: #818cf8; }
+
+    /* Workflow */
+    .mp-section.workflow .sec-icon { background: rgba(16,185,129,0.12); }
+    .mp-section.workflow .sec-label { color: #34d399; }
+    .mp-section.workflow .sec-count { background: rgba(16,185,129,0.12); color: #34d399; }
+
+    /* Memory items */
+    .mem-item {
+      display: flex;
+      gap: 7px;
+      align-items: flex-start;
+      padding: 5px 0;
+      border-bottom: 1px solid #1a1a24;
+      animation: fadeItem 0.3s ease both;
+    }
+    .mem-item:last-child { border-bottom: none; }
+    @keyframes fadeItem {
+      from { opacity: 0; transform: translateX(8px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .mem-item .mi-key {
+      font-size: 10px;
+      font-weight: 700;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      min-width: 48px;
+      flex-shrink: 0;
+      padding-top: 1px;
+    }
+    .mem-item .mi-val {
+      font-size: 11px;
+      color: #bbb;
+      line-height: 1.5;
+      flex: 1;
+    }
+    .mem-item .mi-val strong { color: #e8e8f0; font-weight: 700; }
+    .mem-item .mi-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 6px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Workflow turns */
+    .wf-turn {
+      position: relative;
+      padding: 6px 0 6px 16px;
+      border-bottom: 1px solid #1a1a24;
+      animation: fadeItem 0.3s ease both;
+    }
+    .wf-turn:last-child { border-bottom: none; }
+    .wf-turn::before {
+      content: '';
+      position: absolute;
+      left: 5px; top: 0; bottom: 0;
+      width: 1px;
+      background: #2a2a3a;
+    }
+    .wf-turn::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 12px;
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #34d399;
+      border: 1px solid #0f0f13;
+    }
+    .wf-turn:first-child::after { background: var(--red); }
+    .wf-turn .wf-turn-num {
+      font-size: 9px;
+      color: #444;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 3px;
+    }
+    .wf-turn .wf-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .wf-step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #777;
+    }
+    .wf-step .step-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .wf-step.done   .step-dot { background: #34d399; }
+    .wf-step.active .step-dot { background: #fbbf24; animation: livepulse 1s infinite; }
+    .wf-step.done   { color: #999; }
+    .wf-step.active { color: #fbbf24; }
+    .wf-step .step-label { flex: 1; }
+    .wf-step .step-ms {
+      font-size: 9px;
+      color: #444;
+      font-family: monospace;
+    }
+
+    /* Empty state */
+    .mp-empty {
+      text-align: center;
+      padding: 14px 10px;
+      font-size: 11px;
+      color: #333;
+      font-style: italic;
+    }
+
+    /* Token counter */
+    .mp-footer {
+      border-top: 1px solid #1e1e28;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+    .token-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10px;
+    }
+    .token-row .tk-label { color: #444; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+    .token-row .tk-val { color: #666; font-family: monospace; }
+    .token-bar-wrap { height: 3px; background: #1e1e28; border-radius: 2px; overflow: hidden; }
+    .token-bar { height: 100%; background: linear-gradient(90deg, #34d399, #818cf8); border-radius: 2px; transition: width 0.4s ease; }
+  
+    /* Tom Lembong follow-ups */
+    .tom-followups {
+      max-width: 780px;
+      align-self: flex-start;
+      margin-left: 44px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      animation: msgSlide 0.3s ease both;
+    }
+    .tom-followups .fu-label {
+      font-size: 11px;
+      color: #888;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 4px;
+    }
+    .fu-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      color: #1a1a1a;
+      cursor: pointer;
+      text-align: left;
+      line-height: 1.45;
+      transition: all 0.15s;
+    }
+    .fu-btn:hover {
+      border-color: #e8192c;
+      background: #fff5f5;
+      transform: translateX(3px);
+    }
+    .fu-num {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #e8192c;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fu-text { flex: 1; }
+    .fu-arrow {
+      color: #e8192c;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .demo-toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 12px;
+      font-family: 'Lato', sans-serif;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      z-index: 99999;
+      animation: toastIn 0.3s ease both;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translate(-50%, 12px); }
+      to   { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+  </style>
+<link rel="stylesheet" href="/brand/brand.css" />
+<link rel="stylesheet" href="/brand/chat-overrides.css" />
+<link rel="icon" href="/brand/detikcom.png" />
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="logo">detik</a>
+    <div class="divider-v"></div>
+    <div class="ai-label">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#e8192c" stroke-width="1.5"/>
+        <path d="M8 10h8M8 14h5" stroke="#e8192c" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21" stroke="#e8192c" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      detik AI
+      <span class="badge">BETA</span>
+    </div>
+    <a href="index.html" class="back-link">
+      &#8592; Kembali ke Beranda
+    </a>
+  </div>
+</div>
+
+<!-- CHAT LAYOUT -->
+<div class="chat-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="chat-sidebar">
+    <div class="sidebar-head">
+      <button class="new-chat-btn" id="new-chat-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+          <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        Chat Baru
+      </button>
+    </div>
+
+    <div class="sidebar-section-label">Riwayat Hari Ini</div>
+    <div class="chat-history">
+      <div class="history-item active">
+        <span class="hi-icon">⚖️</span>
+        <span class="hi-text">Wabah Campak 2026</span>
+        <span class="hi-time">baru saja</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Analisis merger Gojek Grab</span>
+        <span class="hi-time">1 jam lalu</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Rangkuman IHSG hari ini</span>
+        <span class="hi-time">2 jam lalu</span>
+      </div>
+      <div class="sidebar-section-label" style="padding-left:0;">Kemarin</div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Piala Asia U-23 prediksi</span>
+        <span class="hi-time">kemarin</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Kebijakan PPN baru DPR</span>
+        <span class="hi-time">kemarin</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">GPT-6 fitur dan perbandingan</span>
+        <span class="hi-time">kemarin</span>
+      </div>
+    </div>
+
+    <div class="sidebar-topics">
+      <div class="sidebar-section-label" style="padding: 0 0 8px;">Topik Cepat</div>
+      <div class="topic-chip" data-q="Apa berita politik terkini hari ini?">
+        <span class="dot" style="background:#e8192c;"></span> Politik
+      </div>
+      <div class="topic-chip" data-q="Bagaimana kondisi ekonomi Indonesia terkini?">
+        <span class="dot" style="background:#f59e0b;"></span> Ekonomi
+      </div>
+      <div class="topic-chip" data-q="Update terbaru Timnas Indonesia?">
+        <span class="dot" style="background:#3b82f6;"></span> Olahraga
+      </div>
+      <div class="topic-chip" data-q="Teknologi AI terbaru yang perlu diketahui?">
+        <span class="dot" style="background:#8b5cf6;"></span> Teknologi
+      </div>
+      <div class="topic-chip" data-q="Rekomendasi destinasi wisata akhir pekan ini?">
+        <span class="dot" style="background:#10b981;"></span> Travel
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <div class="chat-main">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="ai-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+          <path d="M9 10h6M9 14h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 2v2M12 20v2M2 12h2M20 12h2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="info">
+        <h2>detik AI</h2>
+        <p>Asisten berita cerdas — didukung kecerdasan buatan</p>
+      </div>
+      <div class="actions">
+        <button class="icon-btn" title="Bagikan" onclick="alert('Fitur berbagi segera hadir!')">&#10548;</button>
+        <button class="icon-btn" title="Hapus chat" id="clear-chat-btn">&#128465;</button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="chat-messages" id="chat-messages">
+
+      <!-- Welcome state (hidden in scenario auto-flow) -->
+      <div class="chat-welcome" id="chat-welcome" style="display:none;">
+        <div class="welcome-icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="white" stroke-width="1.5"/>
+            <path d="M8 10h8M8 14h5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h2>Memulai percakapan...</h2>
+        <p>Sebentar, detik AI sedang menyiapkan jawaban Anda.</p>
+        <div class="starter-grid" style="display:none;">
+          <button class="starter-card" data-q="Rangkum 5 berita terpenting hari ini dalam bahasa yang mudah dipahami.">
+            <div class="sc-icon">📰</div>
+            <div class="sc-title">Rangkum berita hari ini</div>
+            <div class="sc-desc">5 headline terpenting dalam sekejap</div>
+          </button>
+          <button class="starter-card" data-q="Jelaskan dampak libur nasional tambahan Mei 2026 bagi masyarakat dan dunia usaha.">
+            <div class="sc-icon">🏛️</div>
+            <div class="sc-title">Analisis kebijakan terbaru</div>
+            <div class="sc-desc">Dampak & konteks libur nasional</div>
+          </button>
+          <button class="starter-card" data-q="Apa yang perlu saya ketahui tentang merger Gojek dan Grab?">
+            <div class="sc-icon">📊</div>
+            <div class="sc-title">Jelaskan merger Gojek-Grab</div>
+            <div class="sc-desc">Fakta, dampak, dan prediksi</div>
+          </button>
+          <button class="starter-card" data-q="Berikan update terbaru perjalanan Timnas Indonesia di Piala Asia U-23.">
+            <div class="sc-icon">⚽</div>
+            <div class="sc-title">Update Timnas Indonesia</div>
+            <div class="sc-desc">Piala Asia U-23 terkini</div>
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /chat-messages -->
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <div class="chat-input-wrap">
+        <div class="quick-prompts" id="quick-prompts">
+          <button class="qp-btn" data-q="Apa saja berita viral hari ini?">🔥 Viral hari ini</button>
+          <button class="qp-btn" data-q="Bagaimana perkembangan IHSG hari ini?">📈 IHSG terkini</button>
+          <button class="qp-btn" data-q="Berita politik terpanas pekan ini?">🏛️ Politik</button>
+          <button class="qp-btn" data-q="Tips wisata akhir pekan panjang Mei 2026?">✈️ Tips travel</button>
+          <button class="qp-btn" data-q="Berita teknologi terbaru yang menarik?">💻 Teknologi</button>
+        </div>
+        <div class="input-row">
+          <textarea id="main-chat-input" placeholder="Tanyakan sesuatu kepada detik AI..." rows="1"></textarea>
+          <div class="input-actions">
+            <button id="main-send-btn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="input-hint">detik AI dapat membuat kesalahan. Selalu verifikasi informasi dari sumber berita terpercaya.</p>
+      </div>
+    </div>
+
+  </div><!-- /chat-main -->
+
+  <!-- RIGHT MEMORY PANEL -->
+  <aside class="memory-panel">
+    <div class="mp-header">
+      <span class="mp-title">AI Context</span>
+      <span class="mp-live">Live</span>
+    </div>
+    <div class="mp-body">
+
+      <!-- User Memory -->
+      <div class="mp-section user-mem" id="mp-user-mem">
+        <div class="mp-section-head" onclick="toggleSection(this)">
+          <div class="sec-icon">🧠</div>
+          <span class="sec-label">User Memory</span>
+          <span class="sec-count" id="um-count">0</span>
+          <span class="sec-toggle">▾</span>
+        </div>
+        <div class="mp-section-body" id="um-body">
+          <div class="mp-empty">Belum ada memori tersimpan</div>
+        </div>
+      </div>
+
+      <!-- Session Memory -->
+      <div class="mp-section session-mem" id="mp-session-mem">
+        <div class="mp-section-head" onclick="toggleSection(this)">
+          <div class="sec-icon">💾</div>
+          <span class="sec-label">Session Memory</span>
+          <span class="sec-count" id="sm-count">0</span>
+          <span class="sec-toggle">▾</span>
+        </div>
+        <div class="mp-section-body" id="sm-body">
+          <div class="mp-empty">Sesi baru dimulai</div>
+        </div>
+      </div>
+
+      <!-- Workflow Route -->
+      <div class="mp-section workflow" id="mp-workflow">
+        <div class="mp-section-head" onclick="toggleSection(this)">
+          <div class="sec-icon">🔀</div>
+          <span class="sec-label">Workflow Route</span>
+          <span class="sec-count" id="wf-count">0</span>
+          <span class="sec-toggle">▾</span>
+        </div>
+        <div class="mp-section-body" id="wf-body">
+          <div class="mp-empty">Belum ada percakapan</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="mp-footer">
+      <div class="token-row">
+        <span class="tk-label">Token digunakan</span>
+        <span class="tk-val" id="token-used">0 / 1024</span>
+      </div>
+      <div class="token-bar-wrap">
+        <div class="token-bar" id="token-bar" style="width:0%"></div>
+      </div>
+      <div class="token-row" style="margin-top:2px;">
+        <span class="tk-label">Turns</span>
+        <span class="tk-val" id="turn-count-val">0</span>
+        <span class="tk-label" style="margin-left:12px;">Model</span>
+        <span class="tk-val">haiku-4-5</span>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /chat-layout -->
+
+<script>
+  const msgsEl      = document.getElementById('chat-messages');
+  const welcomeEl   = document.getElementById('chat-welcome');
+  const inputEl     = document.getElementById('main-chat-input');
+  const sendBtn     = document.getElementById('main-send-btn');
+  const newChatBtn  = document.getElementById('new-chat-btn');
+  const clearBtn    = document.getElementById('clear-chat-btn');
+  const qpContainer = document.getElementById('quick-prompts');
+
+  // Panel elements
+  const umBody     = document.getElementById('um-body');
+  const smBody     = document.getElementById('sm-body');
+  const wfBody     = document.getElementById('wf-body');
+  const umCount    = document.getElementById('um-count');
+  const smCount    = document.getElementById('sm-count');
+  const wfCount    = document.getElementById('wf-count');
+  const tokenUsed  = document.getElementById('token-used');
+  const tokenBar   = document.getElementById('token-bar');
+  const turnCountEl= document.getElementById('turn-count-val');
+
+  let isTyping  = false;
+  let msgCount  = 0;
+  let turnCount = 0;
+  let totalTokens = 0;
+
+  // ── Memory stores ──
+  const userMemory = {
+    user_interest: [],
+    preferred_verticals: ['detikNews'],
+    archetype: 'Pembaca berita umum detik.com',
+    contexts: {}
+  };
+  const sessionMemory = [];
+
+  function now() {
+    return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  }
+  function ms() { return Math.floor(Math.random() * 800) + 120; }
+
+  // ── Panel helpers ──
+  function toggleSection(head) {
+    head.closest('.mp-section').classList.toggle('collapsed');
+  }
+  window.toggleSection = toggleSection;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function jsonStr(v) {
+    if (v === '' || v == null) return '<span class="je">""</span>';
+    return `<span class="js">"${escapeHtml(v)}"</span>`;
+  }
+  function jsonArr(arr) {
+    if (!arr || !arr.length) return '<span class="jp">[]</span>';
+    return '<span class="jp">[</span>' + arr.map(jsonStr).join('<span class="jp">, </span>') + '<span class="jp">]</span>';
+  }
+  function renderUserMemory() {
+    const um = userMemory;
+    const ctxKeys = Object.keys(um.contexts || {});
+    const ctxBody = ctxKeys.length
+      ? ctxKeys.map((k, i) => `    <span class="jk">"${escapeHtml(k)}"</span><span class="jp">:</span> ${jsonStr(um.contexts[k])}${i < ctxKeys.length - 1 ? '<span class="jp">,</span>' : ''}`).join('\n')
+      : '';
+    const ctx = ctxKeys.length
+      ? `<span class="jc">{</span>\n${ctxBody}\n  <span class="jc">}</span>`
+      : '<span class="jc">{}</span>';
+    const count = (um.user_interest?.length ? 1 : 0) +
+                  (um.preferred_verticals?.length ? 1 : 0) +
+                  (um.archetype ? 1 : 0) +
+                  ctxKeys.length;
+    umCount.textContent = count;
+    umBody.innerHTML = `<pre class="um-json"><span class="jp">{</span>
+  <span class="jk">"user_interest"</span><span class="jp">:</span> ${jsonArr(um.user_interest)}<span class="jp">,</span>
+  <span class="jk">"preferred_verticals"</span><span class="jp">:</span> ${jsonArr(um.preferred_verticals)}<span class="jp">,</span>
+  <span class="jk">"archetype"</span><span class="jp">:</span> ${jsonStr(um.archetype)}<span class="jp">,</span>
+  <span class="jk">"contexts"</span><span class="jp">:</span> ${ctx}
+<span class="jp">}</span></pre>`;
+  }
+
+  function renderSessionMemory() {
+    smCount.textContent = sessionMemory.length;
+    if (!sessionMemory.length) {
+      smBody.innerHTML = '<div class="mp-empty">Sesi baru dimulai</div>';
+      return;
+    }
+    smBody.innerHTML = sessionMemory.map(m => `
+      <div class="mem-item">
+        <span class="mi-key">${m.key}</span>
+        <span class="mi-val">${m.val}</span>
+        ${m.badge ? `<span class="mi-badge" style="background:${m.badgeColor}22;color:${m.badgeColor}">${m.badge}</span>` : ''}
+      </div>`).join('');
+  }
+
+  function addWorkflowTurn(userText, steps) {
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+
+    // Remove empty state
+    const empty = wfBody.querySelector('.mp-empty');
+    if (empty) empty.remove();
+
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-${turnCount}">
+        ${steps.map((s, i) => `
+          <div class="wf-step done" id="wf-step-${turnCount}-${i}">
+            <span class="step-dot"></span>
+            <span class="step-label">${s.label}</span>
+            <span class="step-ms">${s.ms}ms</span>
+          </div>`).join('')}
+      </div>`;
+    // Prepend so newest is on top
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    wfBody.parentElement.parentElement.scrollTop = 0;
+  }
+
+  function updateTokens(replyLength) {
+    // Rough estimate: ~4 chars per token
+    const newTokens = Math.floor(replyLength / 4) + 40;
+    totalTokens = Math.min(totalTokens + newTokens, 1024);
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${(totalTokens / 1024) * 100}%`;
+  }
+
+  function extractSessionMemory(userText, reply) {
+    // Extract topics mentioned
+    const topics = [];
+    if (/libur|cuti|hari merah/i.test(userText)) topics.push({ key: 'Topik', val: 'Libur Nasional Mei 2026', badge: 'sesi ini', badgeColor: '#818cf8' });
+    if (/ihsg|saham|bursa/i.test(userText)) topics.push({ key: 'Topik', val: 'Pasar saham & IHSG', badge: 'sesi ini', badgeColor: '#818cf8' });
+    if (/timnas|sepak bola|piala/i.test(userText)) topics.push({ key: 'Topik', val: 'Timnas & Piala Asia', badge: 'sesi ini', badgeColor: '#818cf8' });
+    if (/gojek|grab|merger/i.test(userText)) topics.push({ key: 'Topik', val: 'Merger Gojek-Grab', badge: 'sesi ini', badgeColor: '#818cf8' });
+    if (/ai|gpt|teknologi|kecerdasan buatan/i.test(userText)) topics.push({ key: 'Topik', val: 'AI & Teknologi', badge: 'sesi ini', badgeColor: '#818cf8' });
+    if (/wisata|travel|liburan/i.test(userText)) topics.push({ key: 'Topik', val: 'Pariwisata & Travel', badge: 'sesi ini', badgeColor: '#818cf8' });
+
+    // Track turn count
+    const existing = sessionMemory.find(m => m.key === 'Turns');
+    if (existing) {
+      existing.val = `${turnCount} pertanyaan dijawab`;
+    } else {
+      sessionMemory.push({ key: 'Turns', val: `${turnCount} pertanyaan dijawab`, badge: 'live', badgeColor: '#34d399' });
+    }
+
+    // Add unique topics
+    topics.forEach(t => {
+      const dup = sessionMemory.find(m => m.key === 'Topik' && m.val === t.val);
+      if (!dup) sessionMemory.push(t);
+    });
+
+    // Track last query
+    const lastQ = sessionMemory.find(m => m.key === 'Terakhir');
+    const shortQ = userText.length > 30 ? userText.slice(0, 30) + '…' : userText;
+    if (lastQ) lastQ.val = shortQ;
+    else sessionMemory.push({ key: 'Terakhir', val: shortQ, badge: null });
+
+    renderSessionMemory();
+  }
+
+  function extractUserMemory(userText) {
+    if (/english|inggris/i.test(userText)) {
+      userMemory.contexts.language_context = 'User pernah meminta jawaban dalam bahasa Inggris';
+    }
+    const interestMatch = userText.match(/(?:saya suka|favorit saya|minat saya)[,]?\s+(\w[\w\s]{2,30})/i);
+    if (interestMatch) {
+      const topic = interestMatch[1].trim();
+      if (!userMemory.user_interest.includes(topic)) userMemory.user_interest.push(topic);
+    }
+    renderUserMemory();
+  }
+
+  // ── Route classifier ──
+  function classifyRoute(userText) {
+    if (/rangkum|ringkas|summary/i.test(userText))
+      return { route: 'Summarization', icon: '📋', steps: [
+        { label: 'Intent: Summarize', ms: ms() },
+        { label: 'Retrieve context window', ms: ms() },
+        { label: 'Chunk & compress', ms: ms() },
+        { label: 'Generate summary', ms: ms() },
+        { label: 'Format output', ms: ms() }
+      ]};
+    if (/analisis|dampak|pengaruh|kenapa|mengapa/i.test(userText))
+      return { route: 'Analysis', icon: '🔍', steps: [
+        { label: 'Intent: Analyze', ms: ms() },
+        { label: 'Topic extraction', ms: ms() },
+        { label: 'Context enrichment', ms: ms() },
+        { label: 'Multi-angle reasoning', ms: ms() },
+        { label: 'Synthesize answer', ms: ms() }
+      ]};
+    if (/berita|terkini|terbaru|hari ini|update/i.test(userText))
+      return { route: 'News Retrieval', icon: '📰', steps: [
+        { label: 'Intent: News fetch', ms: ms() },
+        { label: 'Classify category', ms: ms() },
+        { label: 'Filter by recency', ms: ms() },
+        { label: 'Rank by relevance', ms: ms() },
+        { label: 'Compose response', ms: ms() }
+      ]};
+    if (/rekomen|saran|tips|ide/i.test(userText))
+      return { route: 'Recommendation', icon: '💡', steps: [
+        { label: 'Intent: Recommend', ms: ms() },
+        { label: 'User preference scan', ms: ms() },
+        { label: 'Candidate generation', ms: ms() },
+        { label: 'Score & rank', ms: ms() },
+        { label: 'Format suggestions', ms: ms() }
+      ]};
+    return { route: 'General QA', icon: '💬', steps: [
+      { label: 'Intent: General query', ms: ms() },
+      { label: 'Parse question', ms: ms() },
+      { label: 'Knowledge retrieval', ms: ms() },
+      { label: 'Generate answer', ms: ms() }
+    ]};
+  }
+
+  // ── Message rendering ──
+  function hideWelcome() {
+    if (welcomeEl) welcomeEl.style.display = 'none';
+  }
+
+  function addUserMsg(text) {
+    hideWelcome();
+    qpContainer.style.display = 'none';
+    msgCount++;
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = `
+      <div class="msg-avatar">Anda</div>
+      <div class="msg-content">
+        <div class="msg-sender">Anda</div>
+        <div class="msg-bubble">${escHtml(text)}</div>
+        <div class="msg-time">${now()}</div>
+      </div>`;
+    msgsEl.appendChild(row);
+    scroll();
+  }
+
+  function addBotMsg(html, sources) {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    let sourcesHtml = '';
+    if (sources && sources.length) {
+      sourcesHtml = `<div class="msg-sources">${sources.map(s =>
+        `<span class="source-pill"><span class="sp-dot"></span>${s}</span>`
+      ).join('')}</div>`;
+    }
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+          <path d="M9 10h6M9 14h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="msg-content">
+        <div class="msg-sender">detik AI</div>
+        <div class="msg-bubble">${html}</div>
+        ${sourcesHtml}
+        <div class="msg-time">${now()}</div>
+      </div>`;
+    msgsEl.appendChild(row);
+    scroll();
+    return row;
+  }
+
+  function addTyping() {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    row.id = 'typing-row';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+          <path d="M9 10h6M9 14h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="msg-content">
+        <div class="msg-sender">detik AI</div>
+        <div class="typing-indicator"><span></span><span></span><span></span></div>
+      </div>`;
+    msgsEl.appendChild(row);
+    scroll();
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typing-row');
+    if (el) el.remove();
+  }
+
+  function scroll() { msgsEl.scrollTop = msgsEl.scrollHeight; }
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function formatReply(text) {
+    return text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+  }
+
+  // ── Main send ──
+  async function sendMessage(text) {
+    if (!text.trim() || isTyping) return;
+
+    // Intercept demo turn 2 — fuzzy match on the parental concern about a 2-yr-old, unvaccinated, "aman?"
+    const lc = text.toLowerCase();
+    const mentionsChild   = /\banak\b|\bbalita\b|\bkirana\b/.test(lc);
+    const mentionsAge     = /\b2\s*(thn|tahun|th|y(ea)?rs?)\b/.test(lc);
+    const mentionsVaccine = /vaksin|imunisasi|mmr/.test(lc);
+    const mentionsSafety  = /\baman\b|bahaya|risiko|berbahaya/.test(lc);
+    if ((mentionsChild && (mentionsVaccine || mentionsAge) && mentionsSafety) ||
+        (mentionsChild && mentionsAge && mentionsVaccine)) {
+      isTyping = true;
+      sendBtn.disabled = true;
+      await runTomTurn2(text);
+      isTyping = false;
+      sendBtn.disabled = inputEl.value.trim().length === 0;
+      return;
+    }
+
+    isTyping = true;
+    sendBtn.disabled = true;
+
+    // Classify route BEFORE typing indicator
+    const { route, icon, steps } = classifyRoute(text);
+
+    addUserMsg(text);
+    addTyping();
+    extractUserMemory(text);
+
+    try {
+      const reply = await window.claude.complete({
+        messages: [{
+          role: 'user',
+          content: `Kamu adalah detik AI, asisten berita cerdas dari detik.com — media berita terbesar Indonesia. Jawab dalam bahasa Indonesia yang jelas, informatif, dan ramah. Jika relevan, berikan konteks berita Indonesia terkini. Batas jawaban: maksimal 5 kalimat atau gunakan poin-poin jika lebih dari 3 hal. Pertanyaan pengguna: ${text}`
+        }]
+      });
+      removeTyping();
+      addBotMsg(formatReply(reply), ['detikNews', 'detikFinance']);
+      addWorkflowTurn(text, steps);
+      extractSessionMemory(text, reply);
+      updateTokens(reply.length + text.length);
+    } catch (e) {
+      removeTyping();
+      addBotMsg('<p>Maaf, terjadi kesalahan. Silakan coba lagi.</p>');
+      addWorkflowTurn(text, [{ label: 'Error: request failed', ms: 0 }]);
+    }
+
+    isTyping = false;
+    sendBtn.disabled = inputEl.value.trim().length === 0;
+  }
+
+  // ── Input events ──
+  inputEl.addEventListener('input', function () {
+    sendBtn.disabled = this.value.trim().length === 0 || isTyping;
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const val = this.value.trim();
+      this.value = '';
+      this.style.height = 'auto';
+      sendBtn.disabled = true;
+      sendMessage(val);
+    }
+  });
+  sendBtn.addEventListener('click', () => {
+    const val = inputEl.value.trim();
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+    sendMessage(val);
+  });
+
+  // Starter cards, quick prompts, topic chips
+  document.querySelectorAll('.starter-card, .qp-btn, .topic-chip').forEach(el => {
+    el.addEventListener('click', () => {
+      const q = el.dataset.q || el.textContent.trim();
+      sendMessage(q);
+    });
+  });
+
+  // New / clear chat
+  newChatBtn.addEventListener('click', () => {
+    msgCount = 0; turnCount = 0; totalTokens = 0;
+    document.querySelectorAll('.msg-row').forEach(el => el.remove());
+    if (welcomeEl) welcomeEl.style.display = 'flex';
+    qpContainer.style.display = 'flex';
+    inputEl.value = '';
+    sendBtn.disabled = true;
+    // Reset panel
+    sessionMemory.length = 0;
+    renderSessionMemory();
+    wfBody.innerHTML = '<div class="mp-empty">Belum ada percakapan</div>';
+    wfCount.textContent = '0';
+    turnCountEl.textContent = '0';
+    tokenUsed.textContent = '0 / 1024';
+    tokenBar.style.width = '0%';
+  });
+  clearBtn.addEventListener('click', () => {
+    if (confirm('Hapus semua pesan di sesi ini?')) newChatBtn.click();
+  });
+
+  // Init
+  renderUserMemory();
+  renderSessionMemory();
+
+  // ── CAMPAK OUTBREAK SCENARIO ──
+  const TOM_ANSWER = `Berdasarkan laporan detikNews, lonjakan kasus campak pada 2026 terjadi di **11 provinsi** dengan konsentrasi tertinggi di **Jawa Barat, Jawa Timur, dan NTT**.
+
+Kemenkes mencatat lebih dari **3.400 kasus** sejak Januari — naik signifikan dibanding periode yang sama tahun lalu. Mayoritas kasus menyerang anak di bawah 5 tahun yang belum mendapat vaksin MMR lengkap.
+
+Lonjakan ini dikaitkan dengan penurunan cakupan vaksinasi pasca-pandemi COVID-19, di mana banyak jadwal imunisasi rutin terlewat.`;
+
+  const TOM_FOLLOWUPS = [
+    "Kenapa cakupan vaksinasi bisa turun separah ini?",
+    "Apa yang Kemenkes lakukan untuk menangani wabah ini?",
+    "Apakah campak berbahaya untuk anak yang belum divaksin?"
+  ];
+
+  const TOM_USER_MEMORY = {
+    user_interest: ['Wabah Campak 2026', 'Vaksinasi', 'Berita kesehatan'],
+    preferred_verticals: ['detikNews'],
+    archetype: 'Pembaca berita yang waspada terhadap isu kesehatan publik dan wabah penyakit menular',
+    contexts: {
+      news_context: 'Mengikuti perkembangan wabah campak 2026 (Jabar, Jatim, NTT)',
+      health_context: 'Tertarik isu cakupan vaksinasi pasca-pandemi dan dampaknya pada balita',
+      confidence: '0.89 → proceeds normally'
+    }
+  };
+
+  const TOM_SESSION_MEMORY = [
+    { key: 'Intent', val: 'Vertical query (class 1) → <strong>NewsBot</strong>', badge: 'class 1', badgeColor: '#06b6d4' },
+    { key: 'Entitas', val: '<strong>campak</strong> (topic)', badge: 'topic', badgeColor: '#818cf8' },
+    { key: 'Entitas', val: '<strong>2026</strong> (time reference)', badge: 'time', badgeColor: '#818cf8' },
+    { key: 'Entitas', val: '<strong>wabah</strong> (topic signal)', badge: 'signal', badgeColor: '#818cf8' },
+    { key: 'Partition', val: 'Baru dibuka — topic: <strong>"Wabah Campak 2026"</strong>', badge: 'new', badgeColor: '#34d399' },
+    { key: 'Retrieval', val: 'detikNews articles on campak outbreak', badge: 'active', badgeColor: '#10b981' }
+  ];
+
+  const TOM_WORKFLOW_STEPS = [
+    { label: 'Classify intent: Vertical query (class 1)', ms: 124 },
+    { label: 'Route to NewsBot vertical', ms: 88 },
+    { label: 'Extract entities: 3 found', ms: 196 },
+    { label: 'Search active partition', ms: 92 },
+    { label: 'Open new partition: Wabah Campak 2026', ms: 154 },
+    { label: 'Retrieve detikNews corpus (campak)', ms: 348 },
+    { label: 'Score confidence: 0.89', ms: 178 },
+    { label: 'Generate news-grounded answer', ms: 584 }
+  ];
+
+  function setTomMemoryPanel() {
+    Object.assign(userMemory, TOM_USER_MEMORY);
+    sessionMemory.length = 0;
+    TOM_SESSION_MEMORY.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+  }
+
+  function renderFollowUps() {
+    const container = document.createElement('div');
+    container.className = 'tom-followups';
+    container.innerHTML = `
+      <div class="fu-label">Tanya lanjutan:</div>
+      ${TOM_FOLLOWUPS.map((q, i) => `
+        <button class="fu-btn" data-q="${q.replace(/"/g,'&quot;')}">
+          <span class="fu-num">${i+1}</span>
+          <span class="fu-text">${q}</span>
+          <span class="fu-arrow">›</span>
+        </button>
+      `).join('')}
+    `;
+    msgsEl.appendChild(container);
+    scroll();
+    container.querySelectorAll('.fu-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const t = document.createElement('div');
+        t.className = 'demo-toast';
+        t.textContent = 'Demo berakhir di sini — hanya 1 turn yang dijalankan';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2200);
+      });
+    });
+  }
+
+  // ===== TURN 2: "Anak saya 2 tahun, belum vaksin lengkap. Dia aman nggak?" =====
+  const TOM_TURN2_USER_MEMORY = {
+    user_interest: ['Wabah Campak 2026', 'Vaksin MMR anak', 'Keamanan anak balita', 'Imunisasi rutin'],
+    preferred_verticals: ['detikNews', 'detikHealth'],
+    archetype: 'Orang tua dengan anak balita yang sedang mempertimbangkan vaksinasi MMR di tengah wabah aktif',
+    contexts: {
+      news_context: 'Mengikuti wabah campak 2026 sebagai isu yang menyentuh keluarga sendiri',
+      health_context: 'User: Rama. Anak: Kirana, 2 tahun. Vaksin MMR belum lengkap. Keluarga rentan dalam wabah aktif',
+      family_context: 'Orang tua dari satu balita usia 2 tahun (Kirana)',
+      confidence: '0.84 → proceeds normally'
+    }
+  };
+
+  const TOM_TURN2_SESSION_UPDATES = [
+    { key: 'Intent', val: 'Vertical query (class 1) — entity signals shift entirely', badge: 'class 1', badgeColor: '#06b6d4' },
+    { key: 'Entitas', val: '<strong>anak</strong> (person), <strong>2 tahun</strong> (age)', badge: 'person+age', badgeColor: '#818cf8' },
+    { key: 'Entitas', val: '<strong>belum vaksin</strong> (health status), <strong>aman</strong> (safety concern)', badge: 'health', badgeColor: '#10b981' },
+    { key: 'Vertical signal', val: 'Bukan NewsBot lagi — "vaksin", "anak", "aman" memetakan kuat ke <strong>HealthBot</strong>', badge: 'pivot', badgeColor: '#f59e0b' },
+    { key: 'Router', val: '<strong>cross-vertical pivot detected</strong>', badge: 'pivot', badgeColor: '#f59e0b' },
+    { key: 'Active partition', val: 'NewsBot / Wabah Campak 2026', badge: 'parent', badgeColor: '#64748b' },
+    { key: 'New vertical', val: '<strong>HealthBot</strong>', badge: 'handoff', badgeColor: '#10b981' },
+    { key: 'Decision', val: 'Buka sub-partition di topic yang sama, hand off ke HealthBot', badge: 'sub', badgeColor: '#34d399' }
+  ];
+
+  const TOM_TURN2_WORKFLOW = [
+    { label: 'Classify intent: Vertical query (class 1)', ms: 121 },
+    { label: 'Extract entities: anak, 2 tahun, belum vaksin, aman', ms: 196 },
+    { label: 'Detect entity-signal shift', ms: 84 },
+    { label: 'Cross-vertical pivot detected: NewsBot → HealthBot', ms: 142 },
+    { label: 'Open sub-partition under "Wabah Campak 2026"', ms: 118 },
+    { label: 'Handoff to HealthBot vertical', ms: 96 },
+    { label: 'Personalize from user memory (Rama, Kirana)', ms: 112 },
+    { label: 'Score confidence: 0.84', ms: 167 },
+    { label: 'Generate health-grounded answer', ms: 598 }
+  ];
+
+  const TOM_TURN2_ANSWER = `Pertanyaan yang penting, **Rama**. Anak usia 2 tahun yang belum mendapat vaksin MMR lengkap masuk dalam kelompok rentan dalam wabah ini.
+
+**Yang perlu kamu tahu:** Campak sangat menular — jauh lebih menular dari flu. Satu orang yang terinfeksi bisa menularkan ke 12–18 orang yang belum kebal. Untuk anak di bawah 5 tahun, komplikasi bisa serius: pneumonia, infeksi telinga, bahkan ensefalitis.
+
+**Status vaksin Kirana:** Vaksin MMR pertama seharusnya diberikan di usia 12–15 bulan. Jika Kirana sudah lewat usia itu dan belum vaksin, ini perlu segera ditindaklanjuti — bukan karena panik, tapi karena wabah aktif sedang berjalan.
+
+**Langkah konkret:** Hubungi puskesmas atau dokter anak terdekat untuk jadwal vaksin MMR secepatnya. Sementara itu, hindari kerumunan dan perhatikan gejala awal: demam tinggi, ruam, mata merah, dan bintik putih di dalam mulut.`;
+
+  const TOM_TURN2_FOLLOWUPS = [
+    'Di mana bisa vaksin MMR terdekat sekarang?',
+    'Apa gejala awal campak yang harus diwaspadai?',
+    'Kalau sudah kena campak, apa yang harus dilakukan?'
+  ];
+
+  function setTomTurn2Memory() {
+    Object.assign(userMemory, TOM_TURN2_USER_MEMORY);
+    sessionMemory.length = 0;
+    TOM_TURN2_SESSION_UPDATES.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+  }
+
+  function showHealthBotHandoffPill() {
+    const pill = document.createElement('div');
+    pill.style.cssText = 'align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#06b6d4,#10b981);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:0.3px;text-transform:uppercase;margin:6px 0 -2px 44px;box-shadow:0 2px 6px rgba(16,185,129,0.35);';
+    pill.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;animation:hbpulse 1.4s ease-in-out infinite"></span> beralih ke HealthBot';
+    if (!document.getElementById('hbpulse-style')) {
+      const s = document.createElement('style');
+      s.id = 'hbpulse-style';
+      s.textContent = '@keyframes hbpulse{0%,100%{opacity:1}50%{opacity:0.4}}';
+      document.head.appendChild(s);
+    }
+    msgsEl.appendChild(pill);
+    scroll();
+  }
+
+  function renderTurn2FollowUps() {
+    const container = document.createElement('div');
+    container.className = 'tom-followups';
+    container.innerHTML = `
+      <div class="fu-label">Tanya lanjutan:</div>
+      ${TOM_TURN2_FOLLOWUPS.map((q, i) => `
+        <button class="fu-btn" data-q="${q.replace(/"/g,'&quot;')}">
+          <span class="fu-num">${i+1}</span>
+          <span class="fu-text">${q}</span>
+          <span class="fu-arrow">›</span>
+        </button>
+      `).join('')}
+    `;
+    msgsEl.appendChild(container);
+    scroll();
+    container.querySelectorAll('.fu-btn').forEach((btn, idx) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const q = btn.getAttribute('data-q');
+        if (idx === 0) {
+          container.remove();
+          runTomTurn3(q);
+        } else {
+          const t = document.createElement('div');
+          t.className = 'demo-toast';
+          t.textContent = 'Demo berakhir di sini — hanya 3 turn yang dijalankan';
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 2200);
+        }
+      });
+    });
+  }
+
+  async function runTomTurn2(userQ) {
+    // Update memory panel BEFORE answer renders so user sees the shift
+    setTomTurn2Memory();
+
+    addUserMsg(userQ);
+    addTyping();
+
+    // Workflow turn
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-tom2"></div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    const wfStepsEl = document.getElementById('wf-steps-tom2');
+
+    for (let i = 0; i < TOM_TURN2_WORKFLOW.length; i++) {
+      const s = TOM_TURN2_WORKFLOW[i];
+      const stepEl = document.createElement('div');
+      stepEl.className = 'wf-step active';
+      const isPivot = /pivot|HealthBot|Handoff/i.test(s.label);
+      stepEl.innerHTML = `
+        <span class="step-dot"${isPivot ? ' style="background:#10b981"' : ''}></span>
+        <span class="step-label"${isPivot ? ' style="color:#10b981;font-weight:600"' : ''}>${s.label}</span>
+        <span class="step-ms">${s.ms}ms</span>`;
+      wfStepsEl.appendChild(stepEl);
+      await new Promise(r => setTimeout(r, 240));
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+    }
+
+    removeTyping();
+    // Subtle handoff signal before the answer renders
+    showHealthBotHandoffPill();
+    await new Promise(r => setTimeout(r, 280));
+    addBotMsg(formatReply(TOM_TURN2_ANSWER), ['HealthBot', 'Kemenkes RI', 'IDAI Imunisasi']);
+
+    totalTokens += Math.floor(TOM_TURN2_ANSWER.length / 4) + 80;
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${Math.min(100, (totalTokens / 1024) * 100)}%`;
+
+    await new Promise(r => setTimeout(r, 400));
+    renderTurn2FollowUps();
+  }
+
+  // ===== TURN 3: "Di mana bisa vaksin MMR terdekat sekarang?" =====
+  const TOM_TURN3_SESSION_UPDATES = [
+    { key: 'Intent', val: 'Navigation + Vertical query hybrid (class 12 + class 1)', badge: 'class 12+1', badgeColor: '#06b6d4' },
+    { key: 'Entitas', val: '<strong>vaksin MMR</strong> (health action), <strong>terdekat</strong> (location signal)', badge: 'action+loc', badgeColor: '#10b981' },
+    { key: 'Vertical', val: '<strong>HealthBot</strong> handles — Action Layer surfaces location guidance', badge: 'action', badgeColor: '#10b981' },
+    { key: 'Retrieval', val: 'Tidak ada bypass — HealthBot retrieves <strong>detikHealth</strong> content on vaccination points', badge: 'retrieve', badgeColor: '#34d399' },
+    { key: 'Partition', val: 'Sub-partition HealthBot tetap aktif di topic <strong>"Wabah Campak 2026"</strong>', badge: 'continued', badgeColor: '#64748b' }
+  ];
+
+  const TOM_TURN3_USER_MEMORY = {
+    user_interest: ['Wabah Campak 2026', 'Vaksin MMR anak', 'Layanan kesehatan terdekat', 'Imunisasi puskesmas/posyandu'],
+    preferred_verticals: ['detikNews', 'detikHealth'],
+    archetype: 'Orang tua yang aktif mencari akses layanan kesehatan terdekat untuk vaksinasi anak',
+    contexts: {
+      news_context: 'Mengikuti wabah campak 2026 sebagai konteks keluarga',
+      health_context: 'User: Rama. Anak: Kirana, 2 tahun. Vaksin MMR belum lengkap; sedang mencari lokasi vaksinasi',
+      family_context: 'Orang tua dari satu balita usia 2 tahun (Kirana)',
+      action_context: 'Mencari titik vaksinasi MMR terdekat — puskesmas/posyandu/klinik swasta',
+      confidence: '0.91 → high (proceeds normally)'
+    }
+  };
+
+  const TOM_TURN3_WORKFLOW = [
+    { label: 'Classify intent: Navigation + Vertical (class 12 + 1)', ms: 138 },
+    { label: 'Extract entities: vaksin MMR, terdekat', ms: 162 },
+    { label: 'Stay in HealthBot vertical', ms: 78 },
+    { label: 'Engage Action Layer: location guidance', ms: 124 },
+    { label: 'Retrieve detikHealth: vaccination points', ms: 312 },
+    { label: 'Personalize for Kirana (usia 2 thn)', ms: 96 },
+    { label: 'Score confidence: 0.91', ms: 145 },
+    { label: 'Generate actionable answer', ms: 612 }
+  ];
+
+  const TOM_TURN3_ANSWER = `Untuk vaksin MMR, **Kirana** bisa dibawa ke:
+
+**Puskesmas terdekat** — gratis, tersedia di seluruh Indonesia, tidak perlu appointment. Bawa buku KIA untuk pencatatan.
+
+**Posyandu** — jadwal bulanan, cocok untuk anak balita. Tanya ke kader posyandu di kelurahanmu untuk jadwal terdekat.
+
+**Dokter anak / klinik swasta** — bisa lebih fleksibel soal jadwal, tapi berbayar. Kisaran Rp 150–300 ribu per dosis.
+
+Mengingat wabah sedang aktif, **puskesmas adalah pilihan tercepat** — biasanya tidak perlu antre panjang untuk imunisasi anak.
+
+Bawa: buku KIA, kartu identitas orang tua, dan pastikan Kirana dalam kondisi sehat saat vaksinasi.`;
+
+  function setTomTurn3Memory() {
+    Object.assign(userMemory, TOM_TURN3_USER_MEMORY);
+    sessionMemory.length = 0;
+    TOM_TURN3_SESSION_UPDATES.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+  }
+
+  async function runTomTurn3(userQ) {
+    setTomTurn3Memory();
+
+    addUserMsg(userQ);
+    addTyping();
+
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-tom3"></div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    const wfStepsEl = document.getElementById('wf-steps-tom3');
+
+    for (let i = 0; i < TOM_TURN3_WORKFLOW.length; i++) {
+      const s = TOM_TURN3_WORKFLOW[i];
+      const stepEl = document.createElement('div');
+      stepEl.className = 'wf-step active';
+      const isAction = /Action Layer|Navigation|location/i.test(s.label);
+      stepEl.innerHTML = `
+        <span class="step-dot"${isAction ? ' style="background:#06b6d4"' : ''}></span>
+        <span class="step-label"${isAction ? ' style="color:#06b6d4;font-weight:600"' : ''}>${s.label}</span>
+        <span class="step-ms">${s.ms}ms</span>`;
+      wfStepsEl.appendChild(stepEl);
+      await new Promise(r => setTimeout(r, 250));
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+    }
+
+    removeTyping();
+    addBotMsg(formatReply(TOM_TURN3_ANSWER), ['HealthBot · Action Layer', 'detikHealth', 'Puskesmas / Posyandu']);
+
+    totalTokens += Math.floor(TOM_TURN3_ANSWER.length / 4) + 80;
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${Math.min(100, (totalTokens / 1024) * 100)}%`;
+  }
+
+  async function runTomScenario() {
+    const userQ = sessionStorage.getItem('detik_ai_first_query') || 'Siapa Tom Lembong dan kenapa ia jadi tersangka?';
+    sessionStorage.removeItem('detik_ai_first_query');
+
+    // Hide welcome + quick prompts
+    if (welcomeEl) welcomeEl.style.display = 'none';
+    qpContainer.style.display = 'none';
+
+    // Set memory panel immediately
+    setTomMemoryPanel();
+
+    // Add user message
+    addUserMsg(userQ);
+
+    // Add typing indicator
+    addTyping();
+
+    // Animate workflow turn step by step
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+    const empty = wfBody.querySelector('.mp-empty');
+    if (empty) empty.remove();
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-tom"></div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    const wfStepsEl = document.getElementById('wf-steps-tom');
+
+    for (let i = 0; i < TOM_WORKFLOW_STEPS.length; i++) {
+      const s = TOM_WORKFLOW_STEPS[i];
+      const stepEl = document.createElement('div');
+      stepEl.className = 'wf-step active';
+      stepEl.innerHTML = `
+        <span class="step-dot"></span>
+        <span class="step-label">${s.label}</span>
+        <span class="step-ms">${s.ms}ms</span>`;
+      wfStepsEl.appendChild(stepEl);
+      await new Promise(r => setTimeout(r, 280));
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+    }
+
+    // Remove typing, show answer
+    removeTyping();
+    addBotMsg(formatReply(TOM_ANSWER), ['detikNews', 'Kemenkes RI', 'Laporan Imunisasi']);
+
+    // Token estimate
+    totalTokens = Math.floor(TOM_ANSWER.length / 4) + 80;
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${(totalTokens / 1024) * 100}%`;
+
+    // Show follow-ups after a brief pause
+    await new Promise(r => setTimeout(r, 400));
+    renderFollowUps();
+  }
+
+  // Trigger scenario if flag is set
+  if (sessionStorage.getItem('detik_ai_scenario') === 'campak_outbreak') {
+    sessionStorage.removeItem('detik_ai_scenario');
+    setTimeout(runTomScenario, 350);
+  }
+
+</script>
+
+</body>
+</html>

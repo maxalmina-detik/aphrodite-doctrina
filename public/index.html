@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>detik.com - Informasi Berita Terkini dan Terpercaya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #e8192c;
+      --red-dark: #c0121f;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e5e5;
+      --bg-light: #f7f7f7;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--bg-light);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; object-fit: cover; }
+
+    /* ── TOP UTILITY BAR ── */
+    .top-bar {
+      background: #1a1a1a;
+      color: #ccc;
+      font-size: 11px;
+      padding: 5px 0;
+    }
+    .top-bar .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-bar a { color: #ccc; }
+    .top-bar a:hover { color: #fff; }
+    .top-bar-left { display: flex; gap: 12px; }
+    .top-bar-right { display: flex; gap: 12px; align-items: center; }
+    .top-bar-right .login-btn {
+      background: var(--red);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--white);
+      border-bottom: 3px solid var(--red);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      font-family: 'Lato', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--red);
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--text); font-size: 12px; font-weight: 400; display: block; letter-spacing: 0; }
+    .header-search {
+      flex: 1;
+      max-width: 380px;
+      display: flex;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .header-search input {
+      border: none;
+      outline: none;
+      padding: 8px 12px;
+      font-size: 13px;
+      flex: 1;
+      font-family: inherit;
+    }
+    .header-search button {
+      background: var(--red);
+      border: none;
+      color: #fff;
+      padding: 0 14px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .header-right { display: flex; gap: 12px; align-items: center; }
+    .weather-widget { font-size: 12px; color: var(--muted); text-align: right; }
+    .weather-widget .temp { font-size: 20px; font-weight: 700; color: var(--text); }
+
+    /* ── NAV TABS ── */
+    nav.main-nav {
+      background: var(--red);
+    }
+    nav.main-nav .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav.main-nav .inner::-webkit-scrollbar { display: none; }
+    nav.main-nav a {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px 14px;
+      display: block;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+    }
+    nav.main-nav a:hover, nav.main-nav a.active { background: var(--red-dark); }
+    nav.main-nav a.active { border-bottom: 3px solid #fff; }
+
+    /* ── TICKER ── */
+    .ticker-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .ticker-bar .ticker-label {
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .ticker-track {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-items {
+      display: flex;
+      animation: ticker 40s linear infinite;
+      width: max-content;
+    }
+    .ticker-items a {
+      font-size: 12px;
+      color: var(--text);
+      padding: 6px 24px 6px 0;
+      white-space: nowrap;
+    }
+    .ticker-items a::after { content: '•'; margin-left: 24px; color: var(--red); }
+    .ticker-items a:last-child::after { display: none; }
+    .ticker-items a:hover { color: var(--red); }
+    @keyframes ticker {
+      0%  { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .container {
+      max-width: 1200px;
+      margin: 16px auto;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 20px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .hero-main {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      background: var(--white);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-main .img-wrap {
+      height: 300px;
+      background: #ddd;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-main .category-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: var(--red);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      z-index: 2;
+    }
+    .hero-main .content { padding: 14px 16px 16px; }
+    .hero-main h1 {
+      font-family: 'Merriweather', serif;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .hero-main h1 a:hover { color: var(--red); }
+    .hero-main .excerpt { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+    .meta { font-size: 11px; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+    .meta .author { color: var(--red); font-weight: 700; }
+    .meta .dot { color: #ccc; }
+
+    .hero-side {
+      background: var(--white);
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+      gap: 0;
+    }
+    .hero-side .img-wrap { width: 120px; flex-shrink: 0; height: 90px; background: #ddd; }
+    .hero-side .content { padding: 10px 12px; }
+    .hero-side h3 { font-size: 13px; font-weight: 700; line-height: 1.4; margin-bottom: 6px; }
+    .hero-side h3 a:hover { color: var(--red); }
+    .hero-side .meta { font-size: 10px; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-title h2 {
+      font-size: 15px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--red);
+      border-bottom: 3px solid var(--red);
+      padding-bottom: 4px;
+    }
+    .section-title .more { margin-left: auto; font-size: 11px; color: var(--red); font-weight: 700; }
+    .section-title .more:hover { text-decoration: underline; }
+
+    /* ── NEWS GRID ── */
+    .news-section { background: var(--white); padding: 16px; border-radius: 2px; margin-bottom: 16px; }
+    .news-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .news-card { display: flex; flex-direction: column; }
+    .news-card .img-wrap { height: 140px; background: #ddd; margin-bottom: 10px; border-radius: 1px; overflow: hidden; }
+    .news-card h3 { font-size: 13px; font-weight: 700; line-height: 1.45; margin-bottom: 6px; }
+    .news-card h3 a:hover { color: var(--red); }
+    .news-card .excerpt { font-size: 12px; color: var(--muted); line-height: 1.55; flex: 1; }
+    .news-card .meta { margin-top: 8px; }
+    .news-card .category-tag { font-size: 10px; font-weight: 700; color: var(--red); text-transform: uppercase; margin-bottom: 4px; }
+
+    /* ── LIST NEWS ── */
+    .news-list { display: flex; flex-direction: column; gap: 0; }
+    .news-list-item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .news-list-item:last-child { border-bottom: none; }
+    .news-list-item .img-wrap { width: 100px; height: 70px; flex-shrink: 0; background: #ddd; overflow: hidden; }
+    .news-list-item .content {}
+    .news-list-item .category-tag { font-size: 10px; font-weight: 700; color: var(--red); text-transform: uppercase; margin-bottom: 3px; }
+    .news-list-item h3 { font-size: 13px; font-weight: 700; line-height: 1.4; margin-bottom: 5px; }
+    .news-list-item h3 a:hover { color: var(--red); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {}
+    .sidebar-block { background: var(--white); border-radius: 2px; margin-bottom: 16px; padding: 14px; }
+    .sidebar-block .section-title h2 { font-size: 13px; }
+    .trending-list { list-style: none; }
+    .trending-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .trending-list li:last-child { border-bottom: none; }
+    .trending-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--border);
+      line-height: 1;
+      min-width: 24px;
+    }
+    .trending-list li:nth-child(1) .trending-num { color: var(--red); }
+    .trending-list li:nth-child(2) .trending-num { color: #e8a019; }
+    .trending-list li:nth-child(3) .trending-num { color: #5b8dd9; }
+    .trending-list li h4 { font-size: 12px; font-weight: 700; line-height: 1.4; }
+    .trending-list li h4 a:hover { color: var(--red); }
+
+    /* Ad placeholder */
+    .ad-box {
+      background: #f0f0f0;
+      border: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      border-radius: 2px;
+    }
+
+    /* ── PLACEHOLDER IMAGES ── */
+    .img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e0e0e0 25%, #d0d0d0 50%, #e0e0e0 75%);
+      background-size: 200% 200%;
+      animation: shimmer 1.5s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 11px;
+      font-family: monospace;
+      text-align: center;
+      padding: 8px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #1a1a1a;
+      color: #999;
+      margin-top: 32px;
+    }
+    .footer-nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 24px;
+    }
+    .footer-col h4 { color: #fff; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .footer-col a { display: block; font-size: 12px; color: #888; margin-bottom: 6px; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom {
+      border-top: 1px solid #333;
+      text-align: center;
+      padding: 12px;
+      font-size: 11px;
+      color: #555;
+    }
+    .footer-logo { font-size: 28px; font-weight: 900; color: var(--red); margin-bottom: 8px; }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .tag-pill {
+      display: inline-block;
+      background: #f0f0f0;
+      color: var(--muted);
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+    .tag-pill:hover { background: var(--red); color: #fff; }
+  </style>
+<link rel="stylesheet" href="/brand/brand.css" />
+<link rel="icon" href="/brand/detikcom.png" />
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="inner">
+    <div class="top-bar-left">
+      <a href="#">detikNews</a>
+      <a href="#">detikFinance</a>
+      <a href="#">detikSport</a>
+      <a href="#">detikHot</a>
+      <a href="#">detikHealth</a>
+      <a href="#">detikInet</a>
+      <a href="#">Rabu, 30 April 2026</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="#">Berlangganan</a>
+      <a href="#">Iklan</a>
+      <a href="#" class="login-btn">Masuk</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      detik<span style="color:var(--red); font-size:10px; letter-spacing:0.5px; display:inline;">&#8226;</span>com
+      <span>Informasi Berita Terkini dan Terpercaya</span>
+    </div>
+    <div class="header-search">
+      <input type="text" placeholder="Cari berita..." />
+      <button>&#128269;</button>
+    </div>
+    <div class="weather-widget">
+      <div class="temp">29°C</div>
+      <div>Jakarta, Berawan</div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="inner">
+    <a href="#" class="active">Home</a>
+    <a href="#">News</a>
+    <a href="#">Finance</a>
+    <a href="#">Sport</a>
+    <a href="#">Hot</a>
+    <a href="#">Oto</a>
+    <a href="#">Inet</a>
+    <a href="#">Travel</a>
+    <a href="#">Food</a>
+    <a href="#">Health</a>
+    <a href="#">Wolipop</a>
+    <a href="#">Property</a>
+    <a href="#">Edu</a>
+    <a href="#">detikX</a>
+    <a href="#">Live TV</a>
+  </div>
+</nav>
+
+<!-- BREAKING NEWS TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">Breaking</div>
+  <div class="ticker-track">
+    <div class="ticker-items" id="ticker">
+      <a href="#">Presiden umumkan paket stimulus ekonomi senilai Rp 150 triliun untuk UMKM</a>
+      <a href="#">Timnas Indonesia lolos ke semifinal Piala Asia U-23 usai kalahkan Korea Selatan</a>
+      <a href="#">Bank Indonesia pertahankan suku bunga acuan di 5,75 persen</a>
+      <a href="#">Gempa magnitudo 5,2 guncang Maluku, tidak berpotensi tsunami</a>
+      <a href="#">Apple rilis iPhone 17 Pro Max di Indonesia mulai Oktober 2026</a>
+      <a href="#">Harga BBM Pertamax naik Rp 200 per liter mulai 1 Mei 2026</a>
+      <a href="#">Presiden umumkan paket stimulus ekonomi senilai Rp 150 triliun untuk UMKM</a>
+      <a href="#">Timnas Indonesia lolos ke semifinal Piala Asia U-23 usai kalahkan Korea Selatan</a>
+      <a href="#">Bank Indonesia pertahankan suku bunga acuan di 5,75 persen</a>
+      <a href="#">Gempa magnitudo 5,2 guncang Maluku, tidak berpotensi tsunami</a>
+      <a href="#">Apple rilis iPhone 17 Pro Max di Indonesia mulai Oktober 2026</a>
+      <a href="#">Harga BBM Pertamax naik Rp 200 per liter mulai 1 Mei 2026</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <main>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+      <!-- Hero Main -->
+      <div class="hero-main">
+        <div class="img-wrap">
+          <div class="img-placeholder">foto berita utama</div>
+          <div class="category-badge">detikNews</div>
+        </div>
+        <div class="content">
+          <h1><a href="article.html">Pemerintah Tetapkan Libur Nasional Tambahan di Bulan Mei, Cek Jadwalnya di Sini</a></h1>
+          <p class="excerpt">Pemerintah melalui Keputusan Presiden resmi menetapkan tanggal merah tambahan pada bulan Mei 2026. Kebijakan ini disambut antusias oleh masyarakat luas, terutama para pekerja kantoran dan pelaku industri pariwisata.</p>
+          <div class="meta">
+            <span class="author">Tim detikNews</span>
+            <span class="dot">•</span>
+            <span>Rabu, 30 Apr 2026</span>
+            <span class="dot">•</span>
+            <span>10:45 WIB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Side 1 -->
+      <div class="hero-side">
+        <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+        <div class="content">
+          <div class="meta" style="margin-bottom:4px;"><span style="font-size:10px; font-weight:700; color:var(--red);">SPORT</span></div>
+          <h3><a href="article.html">Timnas Garuda Kalahkan Korea Selatan 2-1, Indonesia Lolos Semifinal</a></h3>
+          <div class="meta">
+            <span>Rabu, 30 Apr 2026</span>
+            <span class="dot">•</span>
+            <span>09:30 WIB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Side 2 -->
+      <div class="hero-side">
+        <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+        <div class="content">
+          <div class="meta" style="margin-bottom:4px;"><span style="font-size:10px; font-weight:700; color:var(--red);">FINANCE</span></div>
+          <h3><a href="article.html">IHSG Menguat 1,2 Persen, Rupiah Tembus Rp 15.800 per Dolar AS</a></h3>
+          <div class="meta">
+            <span>Rabu, 30 Apr 2026</span>
+            <span class="dot">•</span>
+            <span>08:15 WIB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TERKINI -->
+    <div class="news-section">
+      <div class="section-title">
+        <h2>Terkini</h2>
+        <a class="more" href="#">Lihat Semua &rsaquo;</a>
+      </div>
+      <div class="news-grid-3">
+        <div class="news-card">
+          <div class="img-wrap"><div class="img-placeholder">foto berita</div></div>
+          <div class="category-tag">detikHealth</div>
+          <h3><a href="article.html">Kemenkes Wajibkan Vaksinasi Booster Kedua Bagi Lansia di Atas 65 Tahun</a></h3>
+          <p class="excerpt">Kementerian Kesehatan menerbitkan surat edaran baru yang mewajibkan vaksinasi booster kedua bagi warga lanjut usia.</p>
+          <div class="meta">
+            <span>11:20 WIB</span>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="img-wrap"><div class="img-placeholder">foto berita</div></div>
+          <div class="category-tag">detikInet</div>
+          <h3><a href="article.html">OpenAI Luncurkan GPT-6 dengan Kemampuan Multimodal yang Jauh Lebih Canggih</a></h3>
+          <p class="excerpt">OpenAI secara resmi memperkenalkan GPT-6, model kecerdasan buatan generasi terbaru yang diklaim mampu memproses berbagai jenis data sekaligus.</p>
+          <div class="meta">
+            <span>10:55 WIB</span>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="img-wrap"><div class="img-placeholder">foto berita</div></div>
+          <div class="category-tag">detikOto</div>
+          <h3><a href="article.html">Toyota Luncurkan Kijang Innova Generasi Baru, Harga Mulai Rp 380 Juta</a></h3>
+          <p class="excerpt">Toyota Indonesia resmi meluncurkan Kijang Innova generasi terbaru dengan desain yang lebih modern dan teknologi hybrid terkini.</p>
+          <div class="meta">
+            <span>10:30 WIB</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEWS + FINANCE -->
+    <div class="news-section">
+      <div class="section-title">
+        <h2>detikNews</h2>
+        <a class="more" href="#">Lihat Semua &rsaquo;</a>
+      </div>
+      <div class="news-list">
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="content">
+            <div class="category-tag">Nasional</div>
+            <h3><a href="article.html">DPR Setujui RUU Perpajakan Baru, Tarif PPN Naik Jadi 13 Persen Mulai 2027</a></h3>
+            <div class="meta"><span>Rabu, 30 Apr 2026</span><span class="dot">•</span><span>10:10 WIB</span></div>
+          </div>
+        </div>
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="content">
+            <div class="category-tag">Politik</div>
+            <h3><a href="article.html">KPU Umumkan Jadwal Pemilu 2029, Pilpres dan Pileg Serentak pada Februari</a></h3>
+            <div class="meta"><span>Rabu, 30 Apr 2026</span><span class="dot">•</span><span>09:45 WIB</span></div>
+          </div>
+        </div>
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="content">
+            <div class="category-tag">Hukum</div>
+            <h3><a href="article.html">MA Vonis 15 Tahun Penjara Terdakwa Korupsi Dana Desa Rp 80 Miliar</a></h3>
+            <div class="meta"><span>Rabu, 30 Apr 2026</span><span class="dot">•</span><span>08:50 WIB</span></div>
+          </div>
+        </div>
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="content">
+            <div class="category-tag">Megapolitan</div>
+            <h3><a href="article.html">MRT Jakarta Perpanjang Rute ke Cikarang, Beroperasi Penuh Akhir 2027</a></h3>
+            <div class="meta"><span>Rabu, 30 Apr 2026</span><span class="dot">•</span><span>08:00 WIB</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCE SECTION -->
+    <div class="news-section">
+      <div class="section-title">
+        <h2>detikFinance</h2>
+        <a class="more" href="#">Lihat Semua &rsaquo;</a>
+      </div>
+      <div class="news-grid-3">
+        <div class="news-card">
+          <div class="img-wrap"><div class="img-placeholder">foto</div></div>
+          <h3><a href="article.html">Investasi Asing Masuk Rp 200 Triliun di Kuartal I 2026, Rekor Baru</a></h3>
+          <div class="meta"><span>11:00 WIB</span></div>
+        </div>
+        <div class="news-card">
+          <div class="img-wrap"><div class="img-placeholder">foto</div></div>
+          <h3><a href="article.html">Gojek dan Grab Umumkan Merger, Valuasi Gabungan Capai USD 20 Miliar</a></h3>
+          <div class="meta"><span>10:20 WIB</span></div>
+        </div>
+        <div class="news-card">
+          <div class="img-wrap"><div class="img-placeholder">foto</div></div>
+          <h3><a href="article.html">Harga Emas Antam Hari Ini Rp 1.680.000 per Gram, Naik Tipis</a></h3>
+          <div class="meta"><span>09:00 WIB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAGS -->
+    <div class="news-section">
+      <div class="section-title"><h2>Topik Terpopuler</h2></div>
+      <div>
+        <a href="#" class="tag-pill">Pilpres 2029</a>
+        <a href="#" class="tag-pill">Timnas Indonesia</a>
+        <a href="#" class="tag-pill">IHSG</a>
+        <a href="#" class="tag-pill">AI & Teknologi</a>
+        <a href="#" class="tag-pill">Rupiah</a>
+        <a href="#" class="tag-pill">MRT Jakarta</a>
+        <a href="#" class="tag-pill">Bencana Alam</a>
+        <a href="#" class="tag-pill">Bitcoin</a>
+        <a href="#" class="tag-pill">Kesehatan</a>
+        <a href="#" class="tag-pill">Pariwisata</a>
+        <a href="#" class="tag-pill">iPhone 17</a>
+        <a href="#" class="tag-pill">Subsidi BBM</a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Ad placeholder -->
+    <div class="ad-box" style="height:250px;">Iklan 300×250</div>
+
+    <!-- Trending -->
+    <div class="sidebar-block">
+      <div class="section-title">
+        <h2>Terpopuler</h2>
+      </div>
+      <ul class="trending-list">
+        <li>
+          <span class="trending-num">1</span>
+          <h4><a href="article.html">Pemerintah Tetapkan Libur Nasional Tambahan di Bulan Mei 2026</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">2</span>
+          <h4><a href="article.html">Timnas Garuda Kalahkan Korea Selatan, Lolos ke Semifinal Piala Asia</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">3</span>
+          <h4><a href="article.html">Gojek-Grab Merger Resmi Diumumkan, Ini Dampaknya bagi Pengguna</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">4</span>
+          <h4><a href="article.html">Harga Pertamax Naik Rp 200, Berlaku Mulai 1 Mei 2026</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">5</span>
+          <h4><a href="article.html">Apple Buka Apple Store Pertama di Surabaya, Ini Lokasinya</a></h4>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Terbaru -->
+    <div class="sidebar-block">
+      <div class="section-title">
+        <h2>Terbaru</h2>
+        <a class="more" href="#">Semua &rsaquo;</a>
+      </div>
+      <div class="news-list">
+        <div class="news-list-item" style="padding:8px 0;">
+          <div class="img-wrap" style="width:70px; height:55px;"><div class="img-placeholder" style="font-size:9px;">foto</div></div>
+          <div class="content">
+            <h3 style="font-size:12px;"><a href="article.html">Kebakaran Pasar Senen Berhasil Dipadamkan Setelah 4 Jam</a></h3>
+            <div class="meta"><span>11:35 WIB</span></div>
+          </div>
+        </div>
+        <div class="news-list-item" style="padding:8px 0;">
+          <div class="img-wrap" style="width:70px; height:55px;"><div class="img-placeholder" style="font-size:9px;">foto</div></div>
+          <div class="content">
+            <h3 style="font-size:12px;"><a href="article.html">Netflix Tambah 12 Konten Original Indonesia di Kuartal II 2026</a></h3>
+            <div class="meta"><span>11:10 WIB</span></div>
+          </div>
+        </div>
+        <div class="news-list-item" style="padding:8px 0;">
+          <div class="img-wrap" style="width:70px; height:55px;"><div class="img-placeholder" style="font-size:9px;">foto</div></div>
+          <div class="content">
+            <h3 style="font-size:12px;"><a href="article.html">Cuaca Jakarta Hari Ini: Hujan Lebat Diprakirakan Sore hingga Malam</a></h3>
+            <div class="meta"><span>10:40 WIB</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ad placeholder 2 -->
+    <div class="ad-box" style="height:120px;">Iklan 300×120</div>
+
+    <!-- Live TV Promo -->
+    <div class="sidebar-block" style="background:#1a1a1a; color:#fff;">
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--red); margin-bottom:8px; letter-spacing:0.5px;">🔴 LIVE TV</div>
+      <div style="height:120px; background:#111; display:flex; align-items:center; justify-content:center; margin-bottom:10px; border:1px solid #333;">
+        <span style="color:#555; font-size:11px;">CNN Indonesia Live</span>
+      </div>
+      <p style="font-size:11px; color:#aaa;">Breaking News: Situasi Politik Terkini — Analisis Pakar</p>
+    </div>
+
+  </aside>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-nav">
+    <div class="footer-col">
+      <div class="footer-logo">detik</div>
+      <p style="font-size:11px; color:#666; line-height:1.6;">Informasi berita terkini dan terpercaya. Bagian dari Trans Media.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Kanal Berita</h4>
+      <a href="#">detikNews</a>
+      <a href="#">detikFinance</a>
+      <a href="#">detikSport</a>
+      <a href="#">detikHot</a>
+      <a href="#">detikOto</a>
+    </div>
+    <div class="footer-col">
+      <h4>Gaya Hidup</h4>
+      <a href="#">detikTravel</a>
+      <a href="#">detikFood</a>
+      <a href="#">detikHealth</a>
+      <a href="#">Wolipop</a>
+      <a href="#">detikEdu</a>
+    </div>
+    <div class="footer-col">
+      <h4>Teknologi</h4>
+      <a href="#">detikInet</a>
+      <a href="#">detikX</a>
+      <a href="#">Pasangiklan</a>
+      <a href="#">Berlangganan</a>
+    </div>
+    <div class="footer-col">
+      <h4>Perusahaan</h4>
+      <a href="#">Tentang Kami</a>
+      <a href="#">Redaksi</a>
+      <a href="#">Pedoman Media</a>
+      <a href="#">Kebijakan Privasi</a>
+      <a href="#">Syarat &amp; Ketentuan</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2026 detikcom — PT Agranet Multicitra Siberkom. Semua hak dilindungi.
+  </div>
+</footer>
+
+<script src="ai-widget.js"></script>
+</body>
+</html>

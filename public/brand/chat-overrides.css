@@ -1,0 +1,37 @@
+/* Per-section scrollable panels in the AI chat memory panel.
+   Each section (User Memory / Session Memory / Workflow Route) scrolls
+   independently so growth in one doesn't push the others off-screen. */
+.memory-panel .mp-section .mp-section-body {
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a3a transparent;
+}
+.memory-panel .mp-section .mp-section-body::-webkit-scrollbar {
+  width: 6px;
+}
+.memory-panel .mp-section .mp-section-body::-webkit-scrollbar-thumb {
+  background: #2a2a3a;
+  border-radius: 3px;
+}
+.memory-panel .mp-section.collapsed .mp-section-body {
+  max-height: 0;
+  overflow: hidden;
+}
+
+/* JSON-shaped user-memory rendering */
+.um-json {
+  font-family: 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #c8c8d4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  padding: 4px 2px 2px;
+}
+.um-json .jk { color: #8ab4ff; }            /* keys */
+.um-json .js { color: #ffd482; }            /* strings */
+.um-json .jp { color: #555; }               /* punctuation */
+.um-json .je { color: #6b6b7a; font-style: italic; } /* empty values */
+.um-json .jc { color: #f9a8d4; }            /* nested object braces */

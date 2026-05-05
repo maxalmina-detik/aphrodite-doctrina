@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IHSG Tembus 8.000, Saham Perbankan dan Energi Pimpin Penguatan — detikFinance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #e8192c;
+      --red-dark: #c0121f;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e5e5e5;
+      --bg-light: #f7f7f7;
+      --white: #ffffff;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--bg-light);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; width: 100%; object-fit: cover; }
+
+    /* ── TOP BAR ── */
+    .top-bar {
+      background: #1a1a1a;
+      color: #ccc;
+      font-size: 11px;
+      padding: 5px 0;
+    }
+    .top-bar .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .top-bar a { color: #ccc; }
+    .top-bar a:hover { color: #fff; }
+    .top-bar-left { display: flex; gap: 12px; }
+    .top-bar-right { display: flex; gap: 12px; align-items: center; }
+    .top-bar-right .login-btn {
+      background: var(--red);
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--white);
+      border-bottom: 3px solid var(--red);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo {
+      font-family: 'Lato', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--red);
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--text); font-size: 12px; font-weight: 400; display: block; letter-spacing: 0; }
+    .header-search {
+      flex: 1;
+      max-width: 380px;
+      display: flex;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .header-search input {
+      border: none;
+      outline: none;
+      padding: 8px 12px;
+      font-size: 13px;
+      flex: 1;
+      font-family: inherit;
+    }
+    .header-search button {
+      background: var(--red);
+      border: none;
+      color: #fff;
+      padding: 0 14px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .weather-widget { font-size: 12px; color: var(--muted); text-align: right; }
+    .weather-widget .temp { font-size: 20px; font-weight: 700; color: var(--text); }
+
+    /* ── MAIN NAV ── */
+    nav.main-nav { background: var(--red); }
+    nav.main-nav .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav.main-nav .inner::-webkit-scrollbar { display: none; }
+    nav.main-nav a {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px 14px;
+      display: block;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+    }
+    nav.main-nav a:hover, nav.main-nav a.active { background: var(--red-dark); }
+
+    /* ── TICKER ── */
+    .ticker-bar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+    .ticker-bar .ticker-label {
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 12px;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .ticker-track { flex: 1; overflow: hidden; position: relative; }
+    .ticker-items {
+      display: flex;
+      animation: ticker 40s linear infinite;
+      width: max-content;
+    }
+    .ticker-items a {
+      font-size: 12px;
+      color: var(--text);
+      padding: 6px 24px 6px 0;
+      white-space: nowrap;
+    }
+    .ticker-items a::after { content: '•'; margin-left: 24px; color: var(--red); }
+    .ticker-items a:last-child::after { display: none; }
+    @keyframes ticker {
+      0%  { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .breadcrumb-bar a { color: var(--red); }
+    .breadcrumb-bar a:hover { text-decoration: underline; }
+    .breadcrumb-bar .sep { color: #ccc; }
+
+    /* ── MAIN LAYOUT ── */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto 32px;
+      padding: 0 16px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+    }
+
+    /* ── ARTICLE ── */
+    .article-wrap {
+      background: var(--white);
+      border-radius: 2px;
+      padding: 28px 32px;
+    }
+
+    /* Category tag */
+    .article-category {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+    }
+
+    /* Title */
+    .article-title {
+      font-family: 'Merriweather', serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    /* Deck / summary */
+    .article-deck {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--red);
+      padding-left: 14px;
+    }
+
+    /* Meta row */
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .article-meta .author {
+      font-weight: 700;
+      color: var(--red);
+      font-size: 13px;
+    }
+    .article-meta .dot { color: #ccc; }
+    .article-meta .edit-time { font-style: italic; }
+
+    /* Share buttons */
+    .share-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      align-items: center;
+    }
+    .share-bar .share-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    .share-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      color: #fff;
+      font-family: inherit;
+    }
+    .share-btn.fb { background: #1877f2; }
+    .share-btn.tw { background: #1da1f2; }
+    .share-btn.wa { background: #25d366; }
+    .share-btn.cp { background: var(--muted); }
+    .share-btn:hover { opacity: 0.88; }
+    .share-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Hero image */
+    .article-hero-img {
+      width: 100%;
+      height: 420px;
+      background: #ddd;
+      margin-bottom: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .img-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e0e0e0 25%, #d5d5d5 50%, #e0e0e0 75%);
+      background-size: 200% 200%;
+      animation: shimmer 1.5s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 12px;
+      font-family: monospace;
+      text-align: center;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .article-caption {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+    .article-caption strong { font-style: normal; color: var(--text); font-weight: 700; }
+
+    /* Article body */
+    .article-body {
+      font-family: 'Merriweather', serif;
+      font-size: 16px;
+      line-height: 1.85;
+      color: #222;
+    }
+    .article-body p { margin-bottom: 20px; }
+    .article-body h2 {
+      font-family: 'Lato', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      margin: 28px 0 14px;
+      color: var(--text);
+      border-left: 4px solid var(--red);
+      padding-left: 12px;
+    }
+    .article-body blockquote {
+      background: var(--bg-light);
+      border-left: 4px solid var(--red);
+      padding: 16px 20px;
+      margin: 24px 0;
+      font-style: italic;
+      color: #444;
+      font-size: 15px;
+    }
+    .article-body .inline-img {
+      width: 100%;
+      height: 280px;
+      background: #ddd;
+      margin: 24px 0 8px;
+      overflow: hidden;
+    }
+    .article-body .inline-caption {
+      font-family: 'Lato', sans-serif;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    /* Page nav */
+    .page-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      margin: 24px 0;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .page-nav .pg-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 2px;
+      color: var(--muted);
+    }
+    .page-nav .pg-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .page-nav .pg-btn:hover:not(.active) { border-color: var(--red); color: var(--red); }
+
+    /* Tags */
+    .article-tags {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+    .article-tags .label { font-size: 12px; font-weight: 700; color: var(--muted); }
+    .tag-pill {
+      display: inline-block;
+      background: #f0f0f0;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .tag-pill:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+    /* Reporter card */
+    .reporter-card {
+      display: flex;
+      gap: 14px;
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      padding: 16px;
+      border-radius: 4px;
+      margin: 24px 0;
+      align-items: center;
+    }
+    .reporter-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #ddd;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .reporter-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .reporter-info .bio { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .reporter-info .follow-btn {
+      display: inline-block;
+      margin-top: 6px;
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+
+    /* Comment count */
+    .comment-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 16px 0 24px;
+    }
+    .comment-bar .count { font-weight: 700; font-size: 14px; }
+    .comment-bar .count span { color: var(--red); }
+    .comment-bar .login-cta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .comment-bar .login-cta a { color: var(--red); font-weight: 700; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-title h2 {
+      font-size: 15px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--red);
+      border-bottom: 3px solid var(--red);
+      padding-bottom: 4px;
+    }
+    .section-title .more { margin-left: auto; font-size: 11px; color: var(--red); font-weight: 700; }
+
+    /* ── RELATED ARTICLES ── */
+    .related-section {
+      background: var(--white);
+      border-radius: 2px;
+      padding: 20px 24px;
+      margin-top: 16px;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .related-card .img-wrap { height: 130px; background: #ddd; margin-bottom: 10px; overflow: hidden; }
+    .related-card .category-tag { font-size: 10px; font-weight: 700; color: var(--red); text-transform: uppercase; margin-bottom: 4px; }
+    .related-card h4 { font-size: 13px; font-weight: 700; line-height: 1.45; }
+    .related-card h4 a:hover { color: var(--red); }
+    .related-card .meta { font-size: 11px; color: var(--muted); margin-top: 6px; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {}
+    .sidebar-block { background: var(--white); border-radius: 2px; margin-bottom: 16px; padding: 14px; }
+
+    .trending-list { list-style: none; }
+    .trending-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .trending-list li:last-child { border-bottom: none; }
+    .trending-num {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--border);
+      line-height: 1;
+      min-width: 24px;
+    }
+    .trending-list li:nth-child(1) .trending-num { color: var(--red); }
+    .trending-list li:nth-child(2) .trending-num { color: #e8a019; }
+    .trending-list li:nth-child(3) .trending-num { color: #5b8dd9; }
+    .trending-list li h4 { font-size: 12px; font-weight: 700; line-height: 1.4; }
+    .trending-list li h4 a:hover { color: var(--red); }
+
+    .ad-box {
+      background: #f0f0f0;
+      border: 1px dashed #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      border-radius: 2px;
+    }
+
+    .news-list-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .news-list-item:last-child { border-bottom: none; }
+    .news-list-item .img-wrap { width: 80px; height: 60px; flex-shrink: 0; background: #ddd; overflow: hidden; }
+    .news-list-item h3 { font-size: 12px; font-weight: 700; line-height: 1.4; }
+    .news-list-item h3 a:hover { color: var(--red); }
+    .news-list-item .meta { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+    /* ── FOOTER ── */
+    footer { background: #1a1a1a; color: #999; margin-top: 32px; }
+    .footer-nav {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 24px;
+    }
+    .footer-col h4 { color: #fff; font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px; }
+    .footer-col a { display: block; font-size: 12px; color: #888; margin-bottom: 6px; }
+    .footer-col a:hover { color: #fff; }
+    .footer-bottom { border-top: 1px solid #333; text-align: center; padding: 12px; font-size: 11px; color: #555; }
+    .footer-logo { font-size: 28px; font-weight: 900; color: var(--red); margin-bottom: 8px; }
+
+    /* Sticky sidebar TOC */
+    .toc-block { position: sticky; top: 80px; }
+    .toc-list { list-style: none; }
+    .toc-list li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .toc-list li:last-child { border-bottom: none; }
+    .toc-list a { font-size: 12px; color: var(--muted); line-height: 1.4; display: block; }
+    .toc-list a:hover { color: var(--red); }
+    .toc-list .toc-num { font-weight: 700; color: var(--red); margin-right: 6px; font-size: 11px; }
+  </style>
+<link rel="stylesheet" href="/brand/brand.css" />
+<link rel="icon" href="/brand/detikcom.png" />
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="inner">
+    <div class="top-bar-left">
+      <a href="index.html">detikNews</a>
+      <a href="#">detikFinance</a>
+      <a href="#">detikSport</a>
+      <a href="#">detikHot</a>
+      <a href="#">detikHealth</a>
+      <a href="#">Rabu, 30 April 2026</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="#">Berlangganan</a>
+      <a href="#">Iklan</a>
+      <a href="#" class="login-btn">Masuk</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      detik<span style="color:var(--red); font-size:10px;">&#8226;</span>com
+      <span>Informasi Berita Terkini dan Terpercaya</span>
+    </a>
+    <div class="header-search">
+      <input type="text" placeholder="Cari berita..." />
+      <button>&#128269;</button>
+    </div>
+    <div class="weather-widget">
+      <div class="temp">29°C</div>
+      <div>Jakarta, Berawan</div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN NAV -->
+<nav class="main-nav">
+  <div class="inner">
+    <a href="index.html">Home</a>
+    <a href="#">News</a>
+    <a href="#" class="active">Finance</a>
+    <a href="#">Sport</a>
+    <a href="#">Hot</a>
+    <a href="#">Oto</a>
+    <a href="#">Inet</a>
+    <a href="#">Travel</a>
+    <a href="#">Food</a>
+    <a href="#">Health</a>
+    <a href="#">Wolipop</a>
+    <a href="#">Property</a>
+    <a href="#">Edu</a>
+    <a href="#">detikX</a>
+    <a href="#">Live TV</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-bar">
+  <div class="ticker-label">Breaking</div>
+  <div class="ticker-track">
+    <div class="ticker-items">
+      <a href="#">Presiden umumkan paket stimulus ekonomi senilai Rp 150 triliun untuk UMKM</a>
+      <a href="#">Timnas Indonesia lolos ke semifinal Piala Asia U-23 usai kalahkan Korea Selatan</a>
+      <a href="#">Bank Indonesia pertahankan suku bunga acuan di 5,75 persen</a>
+      <a href="#">Gempa magnitudo 5,2 guncang Maluku, tidak berpotensi tsunami</a>
+      <a href="#">Harga BBM Pertamax naik Rp 200 per liter mulai 1 Mei 2026</a>
+      <a href="#">Presiden umumkan paket stimulus ekonomi senilai Rp 150 triliun untuk UMKM</a>
+      <a href="#">Timnas Indonesia lolos ke semifinal Piala Asia U-23 usai kalahkan Korea Selatan</a>
+      <a href="#">Bank Indonesia pertahankan suku bunga acuan di 5,75 persen</a>
+    </div>
+  </div>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <a href="index.html">Home</a>
+  <span class="sep">&rsaquo;</span>
+  <a href="#">Finance</a>
+  <span class="sep">&rsaquo;</span>
+  <a href="#">Bursa &amp; Valas</a>
+  <span class="sep">&rsaquo;</span>
+  <span>IHSG Tembus 8.000, Saham Perbankan dan Energi Pimpin...</span>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+  <main>
+    <div class="article-wrap">
+
+      <!-- Category + Title -->
+      <a href="#" class="article-category">detikFinance</a>
+      <h1 class="article-title">IHSG Tembus Level 8.000 untuk Pertama Kali, Saham Perbankan dan Energi Pimpin Penguatan</h1>
+
+      <!-- Deck -->
+      <p class="article-deck">Indeks Harga Saham Gabungan (IHSG) mencetak rekor baru sepanjang masa di level 8.021 pada perdagangan Rabu pagi, didorong aliran modal asing dan sentimen positif laporan keuangan kuartal I emiten perbankan besar.</p>
+
+      <!-- Meta -->
+      <div class="article-meta">
+        <span class="author">Budi Santoso</span>
+        <span class="dot">-</span>
+        <span>detikFinance</span>
+        <span class="dot">|</span>
+        <span>Rabu, 30 Apr 2026 09:35 WIB</span>
+        <span class="dot">|</span>
+        <span class="edit-time">diperbarui Rabu, 30 Apr 2026 11:45 WIB</span>
+      </div>
+
+      <!-- Share -->
+      <div class="share-bar">
+        <span class="share-label">Bagikan:</span>
+        <button class="share-btn fb">&#x1F426; Facebook</button>
+        <button class="share-btn tw">&#x1F426; Twitter</button>
+        <button class="share-btn wa">&#128172; WhatsApp</button>
+        <button class="share-btn cp">&#128279; Salin</button>
+        <div class="share-count">&#128065; 24.8K dibaca</div>
+      </div>
+
+      <!-- Hero Image -->
+      <div class="article-hero-img">
+        <div class="img-placeholder">foto utama artikel — layar perdagangan Bursa Efek Indonesia / trading floor BEI</div>
+      </div>
+      <p class="article-caption"><strong>Foto:</strong> Dok. detikFinance/BEI — Layar digital di Gedung Bursa Efek Indonesia menampilkan posisi IHSG yang menembus level 8.000 untuk pertama kalinya, Rabu (30/4/2026).</p>
+
+      <!-- Article Body -->
+      <div class="article-body">
+        <p><strong>Jakarta</strong> — Indeks Harga Saham Gabungan (IHSG) berhasil menembus level psikologis 8.000 untuk pertama kali dalam sejarah pada perdagangan sesi pertama Rabu (30/4/2026). IHSG tercatat menguat 1,42 persen ke posisi 8.021,34 pada pukul 10.15 WIB, dengan nilai transaksi mencapai Rp 9,8 triliun.</p>
+
+        <p>Penguatan ini dipicu oleh kombinasi aliran dana asing yang masuk deras, rilis laporan keuangan kuartal I 2026 emiten-emiten besar yang melampaui ekspektasi, serta sentimen positif dari data inflasi April 2026 yang terkendali di angka 2,3 persen.</p>
+
+        <blockquote>"Ini adalah pencapaian bersejarah bagi pasar modal Indonesia. Level 8.000 mencerminkan kepercayaan investor terhadap fundamental ekonomi Indonesia yang semakin solid," ujar Direktur Utama Bursa Efek Indonesia dalam keterangan resmi.</blockquote>
+
+        <h2>Sektor Perbankan dan Energi Jadi Motor Penggerak</h2>
+
+        <p>Sektor perbankan memimpin penguatan dengan kenaikan rata-rata 2,1 persen. Saham BBRI menguat 2,8 persen ke Rp 5.250, BMRI naik 2,3 persen ke Rp 7.100, dan BBCA menguat 1,9 persen ke Rp 10.450. Ketiga emiten ini masing-masing merilis laba bersih kuartal I yang tumbuh di atas 18 persen secara tahunan.</p>
+
+        <p>Sektor energi turut menjadi pendorong utama seiring harga minyak mentah Brent yang bertahan di atas USD 88 per barel. Saham PGAS naik 3,1 persen, MEDC menguat 2,6 persen, dan ADRO tercatat naik 2,2 persen dalam perdagangan pagi ini.</p>
+
+        <div class="inline-img">
+          <div class="img-placeholder">grafik pergerakan IHSG intraday 30 April 2026 — candlestick chart</div>
+        </div>
+        <p class="inline-caption">Grafik: Pergerakan IHSG pada perdagangan Rabu (30/4/2026) yang menembus level 8.000 untuk pertama kali. (detikFinance/Tim Grafis)</p>
+
+        <h2>Rupiah Ikut Menguat, Tembus Rp 15.750</h2>
+
+        <p>Penguatan IHSG juga dibarengi apresiasi nilai tukar rupiah. Kurs rupiah menguat 0,4 persen ke level Rp 15.752 per dolar AS pada perdagangan pagi ini, level terkuat dalam empat bulan terakhir. Bank Indonesia menyatakan kondisi pasar keuangan domestik dalam keadaan kondusif dan stabil.</p>
+
+        <p>Analis senior dari Mandiri Sekuritas memproyeksikan IHSG berpotensi melanjutkan penguatan menuju level 8.200–8.300 dalam jangka pendek, asalkan sentimen global tetap mendukung dan tidak ada kejutan kebijakan moneter dari The Fed di pertemuan Mei mendatang.</p>
+
+        <h2>Investor Asing Catat Net Buy Rp 1,2 Triliun</h2>
+
+        <p>Data perdagangan menunjukkan investor asing mencatat net buy sebesar Rp 1,2 triliun hingga pukul 10.15 WIB. Akumulasi pembelian bersih asing dalam sepekan terakhir telah mencapai Rp 4,7 triliun, mengindikasikan kepercayaan investor institusional global terhadap pasar saham Indonesia yang semakin kuat menjelang kuartal II 2026.</p>
+      </div>
+
+      <!-- Page nav -->
+      <div class="page-nav">
+        <span style="font-size:12px; color:var(--muted); margin-right:8px;">Halaman</span>
+        <div class="pg-btn active">1</div>
+        <div class="pg-btn">2</div>
+        <div class="pg-btn">&#8250;</div>
+      </div>
+
+      <!-- Tags -->
+      <div class="article-tags">
+        <span class="label">Topik:</span>
+        <a href="#" class="tag-pill">IHSG</a>
+        <a href="#" class="tag-pill">Bursa Efek Indonesia</a>
+        <a href="#" class="tag-pill">Saham</a>
+        <a href="#" class="tag-pill">Rupiah</a>
+        <a href="#" class="tag-pill">Perbankan</a>
+        <a href="#" class="tag-pill">Energi</a>
+        <a href="#" class="tag-pill">Investasi</a>
+      </div>
+
+      <!-- Reporter Card -->
+      <div class="reporter-card">
+        <div class="reporter-avatar">
+          <div class="img-placeholder" style="font-size:10px;">foto</div>
+        </div>
+        <div class="reporter-info">
+          <h4>Budi Santoso</h4>
+          <p class="bio">Reporter detikFinance. Spesialis pasar modal, perbankan, dan ekonomi makro. Bergabung sejak 2019.</p>
+          <span class="follow-btn">+ Ikuti</span>
+        </div>
+      </div>
+
+      <!-- Comment bar -->
+      <div class="comment-bar">
+        <span class="count"><span>142</span> Komentar</span>
+        <span class="login-cta"><a href="#">Masuk</a> untuk berkomentar</span>
+      </div>
+
+    </div><!-- /article-wrap -->
+
+    <!-- RELATED ARTICLES -->
+    <div class="related-section">
+      <div class="section-title">
+        <h2>Berita Terkait</h2>
+      </div>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="category-tag">Finance</div>
+          <h4><a href="article-finance.html">Analis Proyeksi IHSG Bisa Sentuh 8.300 di Kuartal II 2026</a></h4>
+          <div class="meta">Rab, 30 Apr 2026 • 08:00 WIB</div>
+        </div>
+        <div class="related-card">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="category-tag">Finance</div>
+          <h4><a href="article.html">Laporan Keuangan BBRI Kuartal I: Laba Bersih Naik 19,4 Persen jadi Rp 15,2 Triliun</a></h4>
+          <div class="meta">Rab, 30 Apr 2026 • 07:30 WIB</div>
+        </div>
+        <div class="related-card">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:10px;">foto</div></div>
+          <div class="category-tag">Finance</div>
+          <h4><a href="article.html">Rupiah Menguat ke Rp 15.750, Ini Faktor Pendorongnya</a></h4>
+          <div class="meta">Rab, 30 Apr 2026 • 09:10 WIB</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="ad-box" style="height:250px;">Iklan 300×250</div>
+
+    <!-- Trending -->
+    <div class="sidebar-block">
+      <div class="section-title">
+        <h2>Terpopuler</h2>
+      </div>
+      <ul class="trending-list">
+        <li>
+          <span class="trending-num">1</span>
+          <h4><a href="article.html">Pemerintah Tetapkan Libur Nasional Tambahan di Bulan Mei 2026</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">2</span>
+          <h4><a href="article.html">Timnas Garuda Kalahkan Korea Selatan, Lolos ke Semifinal Piala Asia</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">3</span>
+          <h4><a href="article.html">Gojek-Grab Merger Resmi Diumumkan, Ini Dampaknya bagi Pengguna</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">4</span>
+          <h4><a href="article.html">Harga Pertamax Naik Rp 200, Berlaku Mulai 1 Mei 2026</a></h4>
+        </li>
+        <li>
+          <span class="trending-num">5</span>
+          <h4><a href="article.html">Apple Buka Apple Store Pertama di Surabaya, Ini Lokasinya</a></h4>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="sidebar-block toc-block">
+      <div class="section-title">
+        <h2>Isi Artikel</h2>
+      </div>
+      <ul class="toc-list">
+        <li><a href="#"><span class="toc-num">01</span> IHSG cetak rekor 8.021</a></li>
+        <li><a href="#"><span class="toc-num">02</span> Sektor perbankan &amp; energi</a></li>
+        <li><a href="#"><span class="toc-num">03</span> Rupiah tembus Rp 15.750</a></li>
+        <li><a href="#"><span class="toc-num">04</span> Net buy asing Rp 1,2 triliun</a></li>
+      </ul>
+    </div>
+
+    <!-- Terbaru sidebar -->
+    <div class="sidebar-block">
+      <div class="section-title">
+        <h2>Terbaru</h2>
+        <a class="more" href="#">Semua &rsaquo;</a>
+      </div>
+      <div>
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:9px;">foto</div></div>
+          <div>
+            <h3><a href="article.html">DPR Setujui RUU Perpajakan, PPN Naik 13 Persen Mulai 2027</a></h3>
+            <div class="meta">11:35 WIB</div>
+          </div>
+        </div>
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:9px;">foto</div></div>
+          <div>
+            <h3><a href="article.html">IHSG Ditutup Menguat 1,2% ke Level 7.850</a></h3>
+            <div class="meta">11:00 WIB</div>
+          </div>
+        </div>
+        <div class="news-list-item">
+          <div class="img-wrap"><div class="img-placeholder" style="font-size:9px;">foto</div></div>
+          <div>
+            <h3><a href="article.html">Gempa M 5,2 Guncang Maluku, Tidak Berpotensi Tsunami</a></h3>
+            <div class="meta">10:20 WIB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-box" style="height:120px;">Iklan 300×120</div>
+
+  </aside>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-nav">
+    <div class="footer-col">
+      <div class="footer-logo">detik</div>
+      <p style="font-size:11px; color:#666; line-height:1.6;">Informasi berita terkini dan terpercaya. Bagian dari Trans Media.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Kanal Berita</h4>
+      <a href="#">detikNews</a>
+      <a href="#">detikFinance</a>
+      <a href="#">detikSport</a>
+      <a href="#">detikHot</a>
+      <a href="#">detikOto</a>
+    </div>
+    <div class="footer-col">
+      <h4>Gaya Hidup</h4>
+      <a href="#">detikTravel</a>
+      <a href="#">detikFood</a>
+      <a href="#">detikHealth</a>
+      <a href="#">Wolipop</a>
+      <a href="#">detikEdu</a>
+    </div>
+    <div class="footer-col">
+      <h4>Teknologi</h4>
+      <a href="#">detikInet</a>
+      <a href="#">detikX</a>
+      <a href="#">Pasangiklan</a>
+      <a href="#">Berlangganan</a>
+    </div>
+    <div class="footer-col">
+      <h4>Perusahaan</h4>
+      <a href="#">Tentang Kami</a>
+      <a href="#">Redaksi</a>
+      <a href="#">Pedoman Media</a>
+      <a href="#">Kebijakan Privasi</a>
+      <a href="#">Syarat &amp; Ketentuan</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    &copy; 2026 detikcom — PT Agranet Multicitra Siberkom. Semua hak dilindungi.
+  </div>
+</footer>
+
+<script src="ai-widget.js"></script>
+</body>
+</html>

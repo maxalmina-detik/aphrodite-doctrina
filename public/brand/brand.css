@@ -1,0 +1,116 @@
+/* detikcom brand overrides — palette derived from official logo (blue → indigo → purple → magenta → red → orange) */
+:root {
+  --brand-blue:    #2C8AD8;
+  --brand-indigo:  #2B2A95;
+  --brand-purple:  #4B1B9C;
+  --brand-magenta: #B9237A;
+  --brand-red:     #E8192C;
+  --brand-orange:  #F58A1F;
+  --brand-gradient: linear-gradient(
+    90deg,
+    #2C8AD8 0%,
+    #2B2A95 22%,
+    #4B1B9C 42%,
+    #B9237A 62%,
+    #E8192C 82%,
+    #F58A1F 100%
+  );
+  --brand-gradient-soft: linear-gradient(
+    90deg,
+    rgba(44,138,216,0.12) 0%,
+    rgba(75,27,156,0.12) 40%,
+    rgba(232,25,44,0.12) 75%,
+    rgba(245,138,31,0.12) 100%
+  );
+}
+
+/* Header bottom accent uses full gradient instead of flat red */
+header {
+  border-bottom: none !important;
+  box-shadow: 0 3px 0 0 transparent, 0 5px 4px rgba(0,0,0,0.08) !important;
+  position: relative;
+}
+header::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 3px;
+  background: var(--brand-gradient);
+}
+
+/* Main navigation: gradient bar */
+nav.main-nav {
+  background: var(--brand-gradient) !important;
+}
+nav.main-nav a:hover,
+nav.main-nav a.active {
+  background: rgba(0,0,0,0.22) !important;
+}
+
+/* Ticker label uses brand red (still part of palette) but with a subtle left accent */
+.ticker-bar .ticker-label {
+  background: var(--brand-red) !important;
+  position: relative;
+}
+.ticker-bar .ticker-label::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--brand-orange);
+}
+
+/* Top utility bar: subtle gradient underline accent */
+.top-bar {
+  border-bottom: 2px solid transparent;
+  border-image: var(--brand-gradient) 1;
+}
+
+/* Logo: replace text with official PNG */
+.logo,
+a.logo,
+div.logo {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  font-size: 0 !important; /* hide any leftover text nodes */
+  color: transparent !important;
+  letter-spacing: 0 !important;
+  line-height: 1;
+}
+.logo::before {
+  content: "";
+  display: inline-block;
+  width: 44px;
+  height: 44px;
+  background: url('/brand/detikcom.png') center/contain no-repeat;
+  flex-shrink: 0;
+}
+.logo > span,
+.logo img,
+.logo svg { display: none !important; }
+
+/* Compact logo variant in chat top-bar */
+.topbar .logo::before,
+header.topbar .logo::before { width: 32px; height: 32px; }
+
+/* Footer logo (text "detik" in red): swap to small PNG */
+.footer-logo {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+.footer-logo::before {
+  content: "";
+  display: inline-block;
+  width: 56px; height: 56px;
+  background: url('/brand/detikcom.png') center/contain no-repeat;
+}
+
+/* Replace any remaining solid-red full-width banners with gradient where reasonable */
+.brand-bar { background: var(--brand-gradient); color: #fff; }
+
+/* AI floating widget — keep red FAB (matches palette) but accent the header with gradient */
+#detik-ai-popup .popup-header,
+#detik-ai-popup-tom .popup-header {
+  background: var(--brand-gradient) !important;
+}
