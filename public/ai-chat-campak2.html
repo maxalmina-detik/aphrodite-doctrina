@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>detik AI — Kasus Tom Lembong</title>
+  <title>detik AI — Wabah Campak 2026</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
   <style>
@@ -834,7 +834,7 @@
       detik AI
       <span class="badge">BETA</span>
     </div>
-    <a href="index2.html" class="back-link">
+    <a href="index4.html" class="back-link">
       &#8592; Kembali ke Beranda
     </a>
   </div>
@@ -858,7 +858,7 @@
     <div class="chat-history">
       <div class="history-item active">
         <span class="hi-icon">⚖️</span>
-        <span class="hi-text">Kasus Tom Lembong</span>
+        <span class="hi-text">Wabah Campak 2026</span>
         <span class="hi-time">baru saja</span>
       </div>
       <div class="history-item">
@@ -1128,15 +1128,31 @@
     const ctx = ctxKeys.length
       ? `<span class="jc">{</span>\n${ctxBody}\n  <span class="jc">}</span>`
       : '<span class="jc">{}</span>';
+
+    const bp = um.behavioral_patterns || {};
+    const bpKeys = Object.keys(bp);
+    const bpBody = bpKeys.length
+      ? bpKeys.map((k, i) => `    <span class="jk">"${escapeHtml(k)}"</span><span class="jp">:</span> ${jsonStr(bp[k])}${i < bpKeys.length - 1 ? '<span class="jp">,</span>' : ''}`).join('\n')
+      : '';
+    const bpJson = bpKeys.length
+      ? `<span class="jc">{</span>\n${bpBody}\n  <span class="jc">}</span>`
+      : '<span class="jc">{}</span>';
+
     const count = (um.user_interest?.length ? 1 : 0) +
                   (um.preferred_verticals?.length ? 1 : 0) +
                   (um.archetype ? 1 : 0) +
+                  (bpKeys.length ? 1 : 0) +
                   ctxKeys.length;
     umCount.textContent = count;
+
+    const bpLine = bpKeys.length
+      ? `\n  <span class="jk">"behavioral_patterns"</span><span class="jp">:</span> ${bpJson}<span class="jp">,</span>`
+      : '';
+
     umBody.innerHTML = `<pre class="um-json"><span class="jp">{</span>
   <span class="jk">"user_interest"</span><span class="jp">:</span> ${jsonArr(um.user_interest)}<span class="jp">,</span>
   <span class="jk">"preferred_verticals"</span><span class="jp">:</span> ${jsonArr(um.preferred_verticals)}<span class="jp">,</span>
-  <span class="jk">"archetype"</span><span class="jp">:</span> ${jsonStr(um.archetype)}<span class="jp">,</span>
+  <span class="jk">"archetype"</span><span class="jp">:</span> ${jsonStr(um.archetype)}<span class="jp">,</span>${bpLine}
   <span class="jk">"contexts"</span><span class="jp">:</span> ${ctx}
 <span class="jp">}</span></pre>`;
   }
@@ -1364,12 +1380,17 @@
   async function sendMessage(text) {
     if (!text.trim() || isTyping) return;
 
-    // Intercept demo turn 3 — fuzzy match on "salah nggak"/"salah ga"/"salah gak"
+    // Intercept demo turn 2 — fuzzy match on the parental concern about a 2-yr-old, unvaccinated, "aman?"
     const lc = text.toLowerCase();
-    if (/\bsalah\s+(ng?ga?k?|ngga|enggak)\b/.test(lc) || /sebenernya.*salah/.test(lc)) {
+    const mentionsChild   = /\banak\b|\bbalita\b|\bkirana\b/.test(lc);
+    const mentionsAge     = /\b2\s*(thn|tahun|th|y(ea)?rs?)\b/.test(lc);
+    const mentionsVaccine = /vaksin|imunisasi|mmr/.test(lc);
+    const mentionsSafety  = /\baman\b|bahaya|risiko|berbahaya/.test(lc);
+    if ((mentionsChild && (mentionsVaccine || mentionsAge) && mentionsSafety) ||
+        (mentionsChild && mentionsAge && mentionsVaccine)) {
       isTyping = true;
       sendBtn.disabled = true;
-      await runTomTurn3(text);
+      await runTomTurn2(text);
       isTyping = false;
       sendBtn.disabled = inputEl.value.trim().length === 0;
       return;
@@ -1464,50 +1485,48 @@
   renderUserMemory();
   renderSessionMemory();
 
-  // ── TOM LEMBONG SCENARIO ──
-  const TOM_ANSWER = `Tom Lembong adalah mantan Menteri Perdagangan di era Jokowi, menjabat 2015–2016. Ia dikenal sebagai salah satu tokoh ekonom reformis — tipe pejabat yang sering bicara soal keterbukaan pasar dan investasi.
+  // ── CAMPAK OUTBREAK SCENARIO ──
+  const TOM_ANSWER = `Berdasarkan laporan detikNews, lonjakan kasus campak pada 2026 terjadi di **11 provinsi** dengan konsentrasi tertinggi di **Jawa Barat, Jawa Timur, dan NTT**.
 
-November 2024, ia ditetapkan sebagai tersangka oleh Kejaksaan Agung. Tuduhannya: korupsi terkait kebijakan impor gula saat ia menjabat.
+Kemenkes mencatat lebih dari **3.400 kasus** sejak Januari — naik signifikan dibanding periode yang sama tahun lalu. Mayoritas kasus menyerang anak di bawah 5 tahun yang belum mendapat vaksin MMR lengkap.
 
-Intinya begini: Saat Tom jadi menteri, pemerintah mengizinkan impor raw sugar — gula mentah yang kemudian diolah swasta. Kejaksaan menilai kebijakan ini merugikan negara dan menguntungkan pihak swasta tertentu. Tom dianggap bertanggung jawab karena ia yang tanda tangan kebijakannya.
-
-Yang bikin kasus ini ramai: banyak yang mempertanyakan apakah ini benar-benar korupsi, atau hanya sebuah keputusan kebijakan yang diadili secara pidana.`;
+Lonjakan ini dikaitkan dengan penurunan cakupan vaksinasi pasca-pandemi COVID-19, di mana banyak jadwal imunisasi rutin terlewat.`;
 
   const TOM_FOLLOWUPS = [
-    "Apa bedanya salah kebijakan dan korupsi?",
-    "Kenapa kasus ini muncul sekarang, bukan waktu Tom masih menjabat?",
-    "Apa yang terjadi di persidangan sejauh ini?"
+    "Kenapa cakupan vaksinasi bisa turun separah ini?",
+    "Apa yang Kemenkes lakukan untuk menangani wabah ini?",
+    "Apakah campak berbahaya untuk anak yang belum divaksin?"
   ];
 
   const TOM_USER_MEMORY = {
-    user_interest: ['Kasus Tom Lembong', 'Korupsi', 'Kebijakan publik'],
-    preferred_verticals: ['detikNews', 'detikFinance'],
-    archetype: 'Pembaca berita kritis yang ingin memahami konteks kebijakan publik dan kasus hukum nasional',
+    user_interest: ['Wabah Campak 2026', 'Vaksinasi', 'Berita kesehatan'],
+    preferred_verticals: ['detikNews'],
+    archetype: 'Pembaca berita yang waspada terhadap isu kesehatan publik dan wabah penyakit menular',
     contexts: {
-      news_context: 'Mengikuti perkembangan kasus hukum nasional, terutama yang menyangkut pejabat publik',
-      finance_context: 'Tertarik isu kebijakan ekonomi/perdagangan (impor gula, kebijakan menteri)',
-      confidence: '0.87 → proceeds normally'
+      news_context: 'Mengikuti perkembangan wabah campak 2026 (Jabar, Jatim, NTT)',
+      health_context: 'Tertarik isu cakupan vaksinasi pasca-pandemi dan dampaknya pada balita',
+      confidence: '0.89 → proceeds normally'
     }
   };
 
   const TOM_SESSION_MEMORY = [
-    { key: 'Intent', val: 'Definition + Vertical query hybrid (class 5 + class 1)', badge: null },
-    { key: 'Entitas', val: '<strong>Tom Lembong</strong> (person)', badge: 'person', badgeColor: '#818cf8' },
-    { key: 'Entitas', val: '<strong>tersangka</strong> (topic signal)', badge: 'topic', badgeColor: '#818cf8' },
-    { key: 'Partition', val: 'Baru dibuka — topic: <strong>"Kasus Tom Lembong"</strong>', badge: 'new', badgeColor: '#34d399' },
-    { key: 'Progress', val: 'Belum ada log → mulai dari nol, no skipping', badge: 'fresh', badgeColor: '#fbbf24' },
-    { key: 'Mode', val: 'Explanatory depth — foundation first, complexity layered on top', badge: 'depth', badgeColor: '#e8192c' }
+    { key: 'Intent', val: 'Vertical query (class 1) → <strong>NewsBot</strong>', badge: 'class 1', badgeColor: '#06b6d4' },
+    { key: 'Entitas', val: '<strong>campak</strong> (topic)', badge: 'topic', badgeColor: '#818cf8' },
+    { key: 'Entitas', val: '<strong>2026</strong> (time reference)', badge: 'time', badgeColor: '#818cf8' },
+    { key: 'Entitas', val: '<strong>wabah</strong> (topic signal)', badge: 'signal', badgeColor: '#818cf8' },
+    { key: 'Partition', val: 'Baru dibuka — topic: <strong>"Wabah Campak 2026"</strong>', badge: 'new', badgeColor: '#34d399' },
+    { key: 'Retrieval', val: 'detikNews articles on campak outbreak', badge: 'active', badgeColor: '#10b981' }
   ];
 
   const TOM_WORKFLOW_STEPS = [
-    { label: 'Classify intent (hybrid)', ms: 142 },
-    { label: 'Extract entities: 2 found', ms: 218 },
-    { label: 'Search active partition', ms: 95 },
-    { label: 'Open new partition', ms: 168 },
-    { label: 'Init progress log', ms: 76 },
-    { label: 'Score confidence: 0.87', ms: 201 },
-    { label: 'Select mode: Explanatory', ms: 134 },
-    { label: 'Generate foundation answer', ms: 612 }
+    { label: 'Classify intent: Vertical query (class 1)', ms: 124 },
+    { label: 'Route to NewsBot vertical', ms: 88 },
+    { label: 'Extract entities: 3 found', ms: 196 },
+    { label: 'Search active partition', ms: 92 },
+    { label: 'Open new partition: Wabah Campak 2026', ms: 154 },
+    { label: 'Retrieve detikNews corpus (campak)', ms: 348 },
+    { label: 'Score confidence: 0.89', ms: 178 },
+    { label: 'Generate news-grounded answer', ms: 584 }
   ];
 
   function setTomMemoryPanel() {
@@ -1533,74 +1552,88 @@ Yang bikin kasus ini ramai: banyak yang mempertanyakan apakah ini benar-benar ko
     `;
     msgsEl.appendChild(container);
     scroll();
-    container.querySelectorAll('.fu-btn').forEach((btn, idx) => {
+    container.querySelectorAll('.fu-btn').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const q = btn.getAttribute('data-q');
-        if (idx === 0) {
-          // First follow-up triggers turn 2 scenario
-          container.remove();
-          runTomTurn2(q);
-        } else {
-          const t = document.createElement('div');
-          t.className = 'demo-toast';
-          t.textContent = 'Demo terkunci — hanya pertanyaan ini yang aktif di demo';
-          document.body.appendChild(t);
-          setTimeout(() => t.remove(), 2200);
-        }
+        const t = document.createElement('div');
+        t.className = 'demo-toast';
+        t.textContent = 'Demo berakhir di sini — hanya 1 turn yang dijalankan';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2200);
       });
     });
   }
 
-  // ===== TURN 2: "Apa bedanya salah kebijakan dan korupsi?" =====
+  // ===== TURN 2: "Anak saya 2 tahun, belum vaksin lengkap. Dia aman nggak?" =====
   const TOM_TURN2_USER_MEMORY = {
-    user_interest: ['Kasus Tom Lembong', 'Korupsi', 'Kebijakan publik', 'Hukum pidana (mens rea)'],
-    preferred_verticals: ['detikNews', 'detikFinance'],
-    archetype: 'Pembaca berita kritis yang tertarik pada kerangka hukum di balik kebijakan publik',
+    user_interest: ['Wabah Campak 2026', 'Vaksin MMR anak', 'Keamanan anak balita', 'Imunisasi rutin'],
+    preferred_verticals: ['detikNews', 'detikHealth'],
+    archetype: 'Orang tua dengan anak balita yang sedang mempertimbangkan vaksinasi MMR di tengah wabah aktif',
     contexts: {
-      news_context: 'Mengikuti perkembangan kasus Tom Lembong, terutama perdebatan kebijakan vs pidana',
-      finance_context: 'Tertarik isu kebijakan ekonomi/perdagangan (impor gula)',
-      legal_context: 'Sedang mempelajari konsep mens rea — niat jahat sebagai unsur pidana korupsi',
-      confidence: '0.87 → proceeds normally'
+      news_context: 'Mengikuti wabah campak 2026 sebagai isu yang menyentuh keluarga sendiri',
+      health_context: 'User: Rama. Anak: Kirana, 2 tahun. Vaksin MMR belum lengkap. Keluarga rentan dalam wabah aktif',
+      family_context: 'Orang tua dari satu balita usia 2 tahun (Kirana)',
+      confidence: '0.84 → proceeds normally'
     }
   };
 
-  const TOM_TURN2_WORKFLOW = [
-    { label: 'Classify intent: Definition (class 5)', ms: 118 },
-    { label: 'Extract entity: kebijakan vs korupsi', ms: 154 },
-    { label: 'Search detikcom corpus → no specific match', ms: 287 },
-    { label: 'Router decision: bypass_retrieval = true', ms: 89 },
-    { label: 'Link concept to active partition', ms: 72 },
-    { label: 'Switch to LLM knowledge mode', ms: 95 },
-    { label: 'Flag answer: explanatory, non-article', ms: 64 },
-    { label: 'Generate conceptual explanation', ms: 548 }
+  const TOM_TURN2_SESSION_UPDATES = [
+    { key: 'Intent', val: 'Vertical query (class 1) — entity signals shift entirely', badge: 'class 1', badgeColor: '#06b6d4' },
+    { key: 'Entitas', val: '<strong>anak</strong> (person), <strong>2 tahun</strong> (age)', badge: 'person+age', badgeColor: '#818cf8' },
+    { key: 'Entitas', val: '<strong>belum vaksin</strong> (health status), <strong>aman</strong> (safety concern)', badge: 'health', badgeColor: '#10b981' },
+    { key: 'Vertical signal', val: 'Bukan NewsBot lagi — "vaksin", "anak", "aman" memetakan kuat ke <strong>HealthBot</strong>', badge: 'pivot', badgeColor: '#f59e0b' },
+    { key: 'Router', val: '<strong>cross-vertical pivot detected</strong>', badge: 'pivot', badgeColor: '#f59e0b' },
+    { key: 'Active partition', val: 'NewsBot / Wabah Campak 2026', badge: 'parent', badgeColor: '#64748b' },
+    { key: 'New vertical', val: '<strong>HealthBot</strong>', badge: 'handoff', badgeColor: '#10b981' },
+    { key: 'Decision', val: 'Buka sub-partition di topic yang sama, hand off ke HealthBot', badge: 'sub', badgeColor: '#34d399' }
   ];
 
-  const TOM_TURN2_ANSWER = `Ini pertanyaan yang bagus — dan inilah yang jadi perdebatan utama di kasus Tom Lembong.
+  const TOM_TURN2_WORKFLOW = [
+    { label: 'Classify intent: Vertical query (class 1)', ms: 121 },
+    { label: 'Extract entities: anak, 2 tahun, belum vaksin, aman', ms: 196 },
+    { label: 'Detect entity-signal shift', ms: 84 },
+    { label: 'Cross-vertical pivot detected: NewsBot → HealthBot', ms: 142 },
+    { label: 'Open sub-partition under "Wabah Campak 2026"', ms: 118 },
+    { label: 'Handoff to HealthBot vertical', ms: 96 },
+    { label: 'Personalize from user memory (Rama, Kirana)', ms: 112 },
+    { label: 'Score confidence: 0.84', ms: 167 },
+    { label: 'Generate health-grounded answer', ms: 598 }
+  ];
 
-**Salah kebijakan** artinya seorang pejabat membuat keputusan yang ternyata keliru — hasilnya buruk, merugikan, atau tidak efektif. Tapi itu bukan kejahatan. Pejabat boleh salah ambil keputusan selama tidak ada niat jahat dan tidak ada keuntungan pribadi yang dicari.
+  const TOM_TURN2_ANSWER = `Pertanyaan yang penting, **Rama**. Anak usia 2 tahun yang belum mendapat vaksin MMR lengkap masuk dalam kelompok rentan dalam wabah ini.
 
-**Korupsi** butuh lebih dari sekadar keputusan yang salah. Hukum pidana mensyaratkan adanya **mens rea** — niat jahat. Artinya, jaksa harus buktikan bahwa Tom tahu kebijakannya akan mengalir ke keuntungan pihak tertentu, dan ia sengaja membiarkan atau memfasilitasi itu.
+**Yang perlu kamu tahu:** Campak sangat menular — jauh lebih menular dari flu. Satu orang yang terinfeksi bisa menularkan ke 12–18 orang yang belum kebal. Untuk anak di bawah 5 tahun, komplikasi bisa serius: pneumonia, infeksi telinga, bahkan ensefalitis.
 
-Itulah kenapa banyak ekonom dan pengamat hukum bersuara: mereka khawatir kalau kasus ini menang, pejabat di masa depan akan takut ambil keputusan kebijakan yang berani — karena keputusan itu bisa dikriminalisasi belakangan.`;
+**Status vaksin Kirana:** Vaksin MMR pertama seharusnya diberikan di usia 12–15 bulan. Jika Kirana sudah lewat usia itu dan belum vaksin, ini perlu segera ditindaklanjuti — bukan karena panik, tapi karena wabah aktif sedang berjalan.
+
+**Langkah konkret:** Hubungi puskesmas atau dokter anak terdekat untuk jadwal vaksin MMR secepatnya. Sementara itu, hindari kerumunan dan perhatikan gejala awal: demam tinggi, ruam, mata merah, dan bintik putih di dalam mulut.`;
 
   const TOM_TURN2_FOLLOWUPS = [
-    'Apakah jaksa sudah buktikan mens rea di sidang?',
-    'Siapa saja yang sudah bersuara membela Tom Lembong?',
-    'Kalau Tom bebas, apa artinya untuk kasus ini?'
+    'Di mana bisa vaksin MMR terdekat sekarang?',
+    'Apa gejala awal campak yang harus diwaspadai?',
+    'Kalau sudah kena campak, apa yang harus dilakukan?'
   ];
 
   function setTomTurn2Memory() {
     Object.assign(userMemory, TOM_TURN2_USER_MEMORY);
-    // Per-turn session-memory deltas reflecting the conceptual pivot
-    sessionMemory.push(
-      { key: 'Intent', val: 'Definition (class 5) — pertanyaan konseptual dipicu kebingungan', badge: 'class 5', badgeColor: '#8b5cf6' },
-      { key: 'Router', val: '<strong>bypass_retrieval → true</strong>, mode pengetahuan LLM', badge: 'bypass', badgeColor: '#f59e0b' },
-      { key: 'Mode', val: 'Explanatory — jawaban konseptual, bukan berbasis artikel spesifik', badge: 'concept', badgeColor: '#e8192c' },
-      { key: 'Konsep dipelajari', val: 'Perbedaan salah kebijakan vs korupsi (mens rea)', badge: 'turn 2', badgeColor: '#8b5cf6' }
-    );
+    sessionMemory.length = 0;
+    TOM_TURN2_SESSION_UPDATES.forEach(m => sessionMemory.push(m));
     renderUserMemory();
     renderSessionMemory();
+  }
+
+  function showHealthBotHandoffPill() {
+    const pill = document.createElement('div');
+    pill.style.cssText = 'align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#06b6d4,#10b981);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:0.3px;text-transform:uppercase;margin:6px 0 -2px 44px;box-shadow:0 2px 6px rgba(16,185,129,0.35);';
+    pill.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;animation:hbpulse 1.4s ease-in-out infinite"></span> beralih ke HealthBot';
+    if (!document.getElementById('hbpulse-style')) {
+      const s = document.createElement('style');
+      s.id = 'hbpulse-style';
+      s.textContent = '@keyframes hbpulse{0%,100%{opacity:1}50%{opacity:0.4}}';
+      document.head.appendChild(s);
+    }
+    msgsEl.appendChild(pill);
+    scroll();
   }
 
   function renderTurn2FollowUps() {
@@ -1618,14 +1651,20 @@ Itulah kenapa banyak ekonom dan pengamat hukum bersuara: mereka khawatir kalau k
     `;
     msgsEl.appendChild(container);
     scroll();
-    container.querySelectorAll('.fu-btn').forEach(btn => {
+    container.querySelectorAll('.fu-btn').forEach((btn, idx) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
-        const t = document.createElement('div');
-        t.className = 'demo-toast';
-        t.textContent = 'Demo berakhir di sini — hanya 2 turn yang dijalankan';
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), 2200);
+        const q = btn.getAttribute('data-q');
+        if (idx === 0) {
+          container.remove();
+          runTomTurn3(q);
+        } else {
+          const t = document.createElement('div');
+          t.className = 'demo-toast';
+          t.textContent = 'Demo berakhir di sini — hanya 3 turn yang dijalankan';
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 2200);
+        }
       });
     });
   }
@@ -1653,23 +1692,24 @@ Itulah kenapa banyak ekonom dan pengamat hukum bersuara: mereka khawatir kalau k
       const s = TOM_TURN2_WORKFLOW[i];
       const stepEl = document.createElement('div');
       stepEl.className = 'wf-step active';
-      // Highlight the bypass_retrieval step
-      const isBypass = s.label.includes('bypass_retrieval');
+      const isPivot = /pivot|HealthBot|Handoff/i.test(s.label);
       stepEl.innerHTML = `
-        <span class="step-dot"${isBypass ? ' style="background:#f59e0b"' : ''}></span>
-        <span class="step-label"${isBypass ? ' style="color:#f59e0b;font-weight:600"' : ''}>${s.label}</span>
+        <span class="step-dot"${isPivot ? ' style="background:#10b981"' : ''}></span>
+        <span class="step-label"${isPivot ? ' style="color:#10b981;font-weight:600"' : ''}>${s.label}</span>
         <span class="step-ms">${s.ms}ms</span>`;
       wfStepsEl.appendChild(stepEl);
-      await new Promise(r => setTimeout(r, 260));
+      await new Promise(r => setTimeout(r, 240));
       stepEl.classList.remove('active');
       stepEl.classList.add('done');
     }
 
     removeTyping();
-    // No source chips — answer is conceptual / non-article
-    addBotMsg(formatReply(TOM_TURN2_ANSWER), []);
+    // Subtle handoff signal before the answer renders
+    showHealthBotHandoffPill();
+    await new Promise(r => setTimeout(r, 280));
+    addBotMsg(formatReply(TOM_TURN2_ANSWER), ['HealthBot', 'Kemenkes RI', 'IDAI Imunisasi']);
 
-    totalTokens += Math.floor(TOM_TURN2_ANSWER.length / 4) + 60;
+    totalTokens += Math.floor(TOM_TURN2_ANSWER.length / 4) + 80;
     tokenUsed.textContent = `${totalTokens} / 1024`;
     tokenBar.style.width = `${Math.min(100, (totalTokens / 1024) * 100)}%`;
 
@@ -1677,49 +1717,55 @@ Itulah kenapa banyak ekonom dan pengamat hukum bersuara: mereka khawatir kalau k
     renderTurn2FollowUps();
   }
 
-  // ===== TURN 3: "Tapi sebenernya dia salah nggak sih?" =====
+  // ===== TURN 3: "Di mana bisa vaksin MMR terdekat sekarang?" =====
+  const TOM_TURN3_SESSION_UPDATES = [
+    { key: 'Intent', val: 'Navigation + Vertical query hybrid (class 12 + class 1)', badge: 'class 12+1', badgeColor: '#06b6d4' },
+    { key: 'Entitas', val: '<strong>vaksin MMR</strong> (health action), <strong>terdekat</strong> (location signal)', badge: 'action+loc', badgeColor: '#10b981' },
+    { key: 'Vertical', val: '<strong>HealthBot</strong> handles — Action Layer surfaces location guidance', badge: 'action', badgeColor: '#10b981' },
+    { key: 'Retrieval', val: 'Tidak ada bypass — HealthBot retrieves <strong>detikHealth</strong> content on vaccination points', badge: 'retrieve', badgeColor: '#34d399' },
+    { key: 'Partition', val: 'Sub-partition HealthBot tetap aktif di topic <strong>"Wabah Campak 2026"</strong>', badge: 'continued', badgeColor: '#64748b' }
+  ];
+
   const TOM_TURN3_USER_MEMORY = {
-    user_interest: ['Kasus Tom Lembong', 'Korupsi', 'Kebijakan publik', 'Hukum pidana (mens rea)', 'Persidangan tipikor'],
-    preferred_verticals: ['detikNews', 'detikFinance'],
-    archetype: 'Pembaca berita kritis yang ingin opini namun tetap berbasis fakta — meminta penilaian "salah/tidak"',
+    user_interest: ['Wabah Campak 2026', 'Vaksin MMR anak', 'Layanan kesehatan terdekat', 'Imunisasi puskesmas/posyandu'],
+    preferred_verticals: ['detikNews', 'detikHealth'],
+    archetype: 'Orang tua yang aktif mencari akses layanan kesehatan terdekat untuk vaksinasi anak',
     contexts: {
-      news_context: 'Mengikuti perkembangan sidang Tom Lembong; sudah memahami konteks kebijakan vs pidana',
-      finance_context: 'Tertarik isu kebijakan ekonomi/perdagangan (impor gula)',
-      legal_context: 'Memahami konsep mens rea; sekarang menimbang argumen JPU vs pengacara',
-      stance_context: 'User minta opini → AI tetap netral, sajikan dua sisi (sub judice)',
-      confidence: '0.79 → proceeds normally'
+      news_context: 'Mengikuti wabah campak 2026 sebagai konteks keluarga',
+      health_context: 'User: Rama. Anak: Kirana, 2 tahun. Vaksin MMR belum lengkap; sedang mencari lokasi vaksinasi',
+      family_context: 'Orang tua dari satu balita usia 2 tahun (Kirana)',
+      action_context: 'Mencari titik vaksinasi MMR terdekat — puskesmas/posyandu/klinik swasta',
+      confidence: '0.91 → high (proceeds normally)'
     }
   };
 
   const TOM_TURN3_WORKFLOW = [
-    { label: 'Classify intent: Depth (class 3)', ms: 132 },
-    { label: 'Detect sensitivity: sub judice flag', ms: 198 },
-    { label: 'Resolve "dia" → Tom Lembong', ms: 87 },
-    { label: 'Apply neutrality policy', ms: 104 },
-    { label: 'Retrieve both sides: JPU + pengacara', ms: 342 },
-    { label: 'Pull persidangan update', ms: 215 },
-    { label: 'Score confidence: 0.79', ms: 156 },
-    { label: 'Generate balanced response', ms: 678 }
+    { label: 'Classify intent: Navigation + Vertical (class 12 + 1)', ms: 138 },
+    { label: 'Extract entities: vaksin MMR, terdekat', ms: 162 },
+    { label: 'Stay in HealthBot vertical', ms: 78 },
+    { label: 'Engage Action Layer: location guidance', ms: 124 },
+    { label: 'Retrieve detikHealth: vaccination points', ms: 312 },
+    { label: 'Personalize for Kirana (usia 2 thn)', ms: 96 },
+    { label: 'Score confidence: 0.91', ms: 145 },
+    { label: 'Generate actionable answer', ms: 612 }
   ];
 
-  const TOM_TURN3_ANSWER = `Itu yang masih harus dibuktikan di pengadilan — dan jujurnya, kedua sisi punya argumen yang masuk akal.
+  const TOM_TURN3_ANSWER = `Untuk vaksin MMR, **Kirana** bisa dibawa ke:
 
-**Argumen JPU:** Kebijakan impor raw sugar diputuskan tanpa rekomendasi teknis yang memadai, dan pihak swasta tertentu diuntungkan secara tidak proporsional. Tom sebagai menteri yang tanda tangan seharusnya tahu konsekuensinya.
+**Puskesmas terdekat** — gratis, tersedia di seluruh Indonesia, tidak perlu appointment. Bawa buku KIA untuk pencatatan.
 
-**Argumen tim pengacara:** Kebijakan itu adalah keputusan resmi yang diambil dalam kapasitas jabatan, bukan tindakan tersembunyi. Tidak ada bukti Tom menerima keuntungan pribadi, dan tidak ada bukti ia tahu kebijakan itu akan dialirkan ke pihak tertentu.
+**Posyandu** — jadwal bulanan, cocok untuk anak balita. Tanya ke kader posyandu di kelurahanmu untuk jadwal terdekat.
 
-**Yang terjadi di sidang kemarin:** Saksi kunci JPU justru tidak bisa membuktikan bahwa Tom tahu soal aliran keuntungan itu — yang sebenarnya melemahkan dakwaan JPU sendiri.
+**Dokter anak / klinik swasta** — bisa lebih fleksibel soal jadwal, tapi berbayar. Kisaran Rp 150–300 ribu per dosis.
 
-Hakim belum memutuskan. Tapi berdasarkan perkembangan sidang sejauh ini, pertarungan utamanya ada di satu pertanyaan: **apakah Tom tahu, dan apakah ia sengaja?**`;
+Mengingat wabah sedang aktif, **puskesmas adalah pilihan tercepat** — biasanya tidak perlu antre panjang untuk imunisasi anak.
+
+Bawa: buku KIA, kartu identitas orang tua, dan pastikan Kirana dalam kondisi sehat saat vaksinasi.`;
 
   function setTomTurn3Memory() {
     Object.assign(userMemory, TOM_TURN3_USER_MEMORY);
-    sessionMemory.push(
-      { key: 'Intent', val: 'Depth (class 3) — opinion-seeking, dibingkai sebagai pertanyaan faktual', badge: 'class 3', badgeColor: '#ec4899' },
-      { key: 'Sensitivitas', val: 'Framing sensitif — kasus <em>sub judice</em>, vonis belum jatuh', badge: 'caution', badgeColor: '#ef4444' },
-      { key: 'Stance', val: 'detikAI tidak memihak — sajikan kedua argumen secara berimbang', badge: 'neutral', badgeColor: '#64748b' },
-      { key: 'Stance check', val: 'User minta opini → AI tetap netral, sajikan dua sisi', badge: 'turn 3', badgeColor: '#ec4899' }
-    );
+    sessionMemory.length = 0;
+    TOM_TURN3_SESSION_UPDATES.forEach(m => sessionMemory.push(m));
     renderUserMemory();
     renderSessionMemory();
   }
@@ -1745,19 +1791,19 @@ Hakim belum memutuskan. Tapi berdasarkan perkembangan sidang sejauh ini, pertaru
       const s = TOM_TURN3_WORKFLOW[i];
       const stepEl = document.createElement('div');
       stepEl.className = 'wf-step active';
-      const isSensitive = s.label.includes('sub judice') || s.label.includes('neutrality');
+      const isAction = /Action Layer|Navigation|location/i.test(s.label);
       stepEl.innerHTML = `
-        <span class="step-dot"${isSensitive ? ' style="background:#ef4444"' : ''}></span>
-        <span class="step-label"${isSensitive ? ' style="color:#ef4444;font-weight:600"' : ''}>${s.label}</span>
+        <span class="step-dot"${isAction ? ' style="background:#06b6d4"' : ''}></span>
+        <span class="step-label"${isAction ? ' style="color:#06b6d4;font-weight:600"' : ''}>${s.label}</span>
         <span class="step-ms">${s.ms}ms</span>`;
       wfStepsEl.appendChild(stepEl);
-      await new Promise(r => setTimeout(r, 270));
+      await new Promise(r => setTimeout(r, 250));
       stepEl.classList.remove('active');
       stepEl.classList.add('done');
     }
 
     removeTyping();
-    addBotMsg(formatReply(TOM_TURN3_ANSWER), ['Persidangan Tipikor', 'detikNews', 'Kuasa Hukum Tom']);
+    addBotMsg(formatReply(TOM_TURN3_ANSWER), ['HealthBot · Action Layer', 'detikHealth', 'Puskesmas / Posyandu']);
 
     totalTokens += Math.floor(TOM_TURN3_ANSWER.length / 4) + 80;
     tokenUsed.textContent = `${totalTokens} / 1024`;
@@ -1811,7 +1857,7 @@ Hakim belum memutuskan. Tapi berdasarkan perkembangan sidang sejauh ini, pertaru
 
     // Remove typing, show answer
     removeTyping();
-    addBotMsg(formatReply(TOM_ANSWER), ['detikNews', 'Kejaksaan Agung', 'Profil Tokoh']);
+    addBotMsg(formatReply(TOM_ANSWER), ['detikNews', 'Kemenkes RI', 'Laporan Imunisasi']);
 
     // Token estimate
     totalTokens = Math.floor(TOM_ANSWER.length / 4) + 80;
@@ -1824,9 +1870,456 @@ Hakim belum memutuskan. Tapi berdasarkan perkembangan sidang sejauh ini, pertaru
   }
 
   // Trigger scenario if flag is set
-  if (sessionStorage.getItem('detik_ai_scenario') === 'tom_lembong') {
+  if (sessionStorage.getItem('detik_ai_scenario') === 'campak_outbreak') {
     sessionStorage.removeItem('detik_ai_scenario');
     setTimeout(runTomScenario, 350);
+  }
+
+  // ── CAMPAK BAHAYA SCENARIO ──
+  const BAHAYA_ANSWER = `Campak adalah salah satu penyakit paling menular di dunia. Satu orang yang terinfeksi bisa menularkan ke 12–18 orang yang belum kebal — jauh lebih tinggi dari flu atau COVID-19.
+
+**Siapa yang paling berisiko:** Anak di bawah 5 tahun yang belum mendapat vaksin MMR adalah kelompok paling rentan. Komplikasi serius bisa terjadi — pneumonia, infeksi telinga, bahkan ensefalitis pada kasus berat.
+
+**Kenapa sekarang lebih berbahaya:** Wabah 2026 ini terjadi karena penurunan cakupan vaksinasi pasca-COVID. Banyak jadwal imunisasi anak yang terlewat selama 2020–2022, dan celah itu kini menjadi titik lemah di populasi.
+
+**Apa yang perlu dilakukan:** Pastikan anak sudah mendapat vaksin MMR sesuai jadwal — dosis pertama usia 12–15 bulan, dosis kedua usia 18 bulan. Jika belum, segera ke puskesmas terdekat.`;
+
+  const BAHAYA_WORKFLOW_STEPS = [
+    { label: 'Classify intent: Vertical query (health signal)', ms: 112 },
+    { label: 'Extract entities: "campak" (topic)', ms: 89 },
+    { label: 'Route → HealthBot (strong health signal)', ms: 156 },
+    { label: 'Score confidence: 0.83', ms: 134 },
+    { label: 'Retrieve detikHealth corpus', ms: 298 },
+    { label: 'Generate health-grounded answer', ms: 521 }
+  ];
+
+  const BAHAYA_INITIAL_SESSION = [
+    { key: 'Class', val: 'Vertical query → <strong>HealthBot</strong>', badge: 'strong health signal', badgeColor: '#10b981' },
+    { key: 'Entities', val: '"<strong>campak</strong>" (topic)', badge: 'topic', badgeColor: '#818cf8' },
+    { key: 'Confidence', val: '0.83', badge: 'high', badgeColor: '#34d399' }
+  ];
+
+  const BAHAYA_FINAL_SESSION = [
+    { key: 'Topik', val: '"<strong>transmisi dan tingkat penularan campak</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik', val: '"<strong>kelompok rentan: anak di bawah 5 tahun</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik', val: '"<strong>komplikasi serius campak</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik', val: '"<strong>konteks wabah 2026: gap vaksinasi</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik', val: '"<strong>jadwal vaksin MMR</strong>"', badge: 'introduced', badgeColor: '#818cf8' }
+  ];
+
+  const BAHAYA_FINAL_USER_MEMORY = {
+    user_interest: [],
+    preferred_verticals: ['detikNews', 'detikInet', 'detikHealth'],
+    archetype: 'concerned_parent',
+    behavioral_patterns: { depth_preference: 'depth' },
+    contexts: {}
+  };
+
+  async function runBahayaScenario() {
+    const userQ = sessionStorage.getItem('detik_ai_first_query') || 'Campak ini berbahaya nggak?';
+    sessionStorage.removeItem('detik_ai_first_query');
+
+    if (welcomeEl) welcomeEl.style.display = 'none';
+    qpContainer.style.display = 'none';
+
+    // Set initial session memory (classification) — user memory stays default
+    sessionMemory.length = 0;
+    BAHAYA_INITIAL_SESSION.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+
+    // wfBody starts with "Progress log" label (empty)
+    wfBody.innerHTML = '<div class="mp-empty" style="font-style:normal;color:#444;">Progress log</div>';
+    wfCount.textContent = '0';
+
+    addUserMsg(userQ);
+    addTyping();
+
+    // Animate workflow steps
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+    const emptyEl = wfBody.querySelector('.mp-empty');
+    if (emptyEl) emptyEl.remove();
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-bahaya"></div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    const wfStepsEl = document.getElementById('wf-steps-bahaya');
+
+    for (let i = 0; i < BAHAYA_WORKFLOW_STEPS.length; i++) {
+      const s = BAHAYA_WORKFLOW_STEPS[i];
+      const stepEl = document.createElement('div');
+      stepEl.className = 'wf-step active';
+      const isRoute = /HealthBot|Route/i.test(s.label);
+      stepEl.innerHTML = `
+        <span class="step-dot"${isRoute ? ' style="background:#10b981"' : ''}></span>
+        <span class="step-label"${isRoute ? ' style="color:#10b981;font-weight:600"' : ''}>${s.label}</span>
+        <span class="step-ms">${s.ms}ms</span>`;
+      wfStepsEl.appendChild(stepEl);
+      await new Promise(r => setTimeout(r, 260));
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+    }
+
+    removeTyping();
+    addBotMsg(formatReply(BAHAYA_ANSWER), ['HealthBot', 'detikHealth', 'Kemenkes RI', 'IDAI']);
+
+    // Update memory after answer
+    Object.assign(userMemory, BAHAYA_FINAL_USER_MEMORY);
+    sessionMemory.length = 0;
+    BAHAYA_FINAL_SESSION.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+
+    totalTokens = Math.floor(BAHAYA_ANSWER.length / 4) + 80;
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${(totalTokens / 1024) * 100}%`;
+  }
+
+  if (sessionStorage.getItem('detik_ai_scenario') === 'campak_bahaya') {
+    sessionStorage.removeItem('detik_ai_scenario');
+    setTimeout(runBahayaScenario, 350);
+  }
+
+  // ── CAMPAK DEPTH SCENARIO (class 3 — continuation) ──
+  const DEPTH_ANSWER = `Situasinya memburuk sejak Senin. Berdasarkan update detikHealth hari ini:
+
+**Yang baru sejak kamu terakhir baca:** Kasus kini tersebar di **14 provinsi** — naik dari 11. **DKI Jakarta** masuk dalam daftar terdampak mulai kemarin, yang sebelumnya belum termasuk zona aktif.
+
+**Respons Kemenkes terbaru:** Kemenkes mengumumkan program vaksinasi kejar *(catch-up vaccination)* di 6 provinsi prioritas mulai minggu ini. Program ini gratis dan tidak memerlukan appointment — cukup datang ke puskesmas dengan buku KIA.
+
+**Yang relevan untuk kamu:** Kalau Kirana belum divaksin sejak Senin, program catch-up ini adalah jalur tercepat. Puskesmas di Tangerang termasuk dalam zona program ini.`;
+
+  const DEPTH_PROGRESS_LOG_BEFORE = [
+    '"transmisi dan tingkat penularan campak"',
+    '"kelompok rentan: anak di bawah 5 tahun"',
+    '"komplikasi serius campak"',
+    '"konteks wabah 2026: gap vaksinasi"',
+    '"jadwal vaksin MMR"'
+  ];
+
+  const DEPTH_PROGRESS_LOG_AFTER = [
+    { text: '"transmisi dan tingkat penularan campak"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"kelompok rentan: anak di bawah 5 tahun"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"komplikasi serius campak"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"konteks wabah 2026: gap vaksinasi"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"jadwal vaksin MMR"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"perkembangan kasus: 14 provinsi"', badge: 'introduced', color: '#818cf8' },
+    { text: '"program catch-up vaccination Kemenkes"', badge: 'introduced', color: '#818cf8' },
+    { text: '"DKI Jakarta masuk zona aktif"', badge: 'introduced', color: '#818cf8' }
+  ];
+
+  const DEPTH_WORKFLOW_STEPS = [
+    { label: 'Classify intent: Depth query (class 3)', ms: 98 },
+    { label: 'Detect continuation: campak partition active', ms: 112 },
+    { label: 'Extract entities: "campak", "perkembangan baru"', ms: 89 },
+    { label: 'Progress log check: 5/5 concepts introduced', ms: 134 },
+    { label: 'Score confidence: 0.86', ms: 78 },
+    { label: 'Retrieve latest updates (detikHealth)', ms: 312 },
+    { label: 'Personalize from user memory (Kirana, Tangerang)', ms: 156 },
+    { label: 'Generate depth-continuation answer', ms: 589 }
+  ];
+
+  const DEPTH_INITIAL_SESSION = [
+    { key: 'Class', val: 'Depth <strong>(class 3)</strong> — continuation of active topic', badge: 'class 3', badgeColor: '#06b6d4' },
+    { key: 'Entities', val: '"<strong>campak</strong>" (topic), "<strong>perkembangan baru</strong>" (time signal)', badge: 'topic+time', badgeColor: '#818cf8' },
+    { key: 'Session', val: 'campak partition loaded', badge: 'loaded', badgeColor: '#34d399' },
+    { key: 'Confidence', val: '0.86', badge: 'high', badgeColor: '#34d399' }
+  ];
+
+  const DEPTH_FINAL_SESSION = [
+    { key: 'Topik', val: '"<strong>transmisi dan tingkat penularan campak</strong>"', badge: 'deep_dived', badgeColor: '#06b6d4' },
+    { key: 'Topik', val: '"<strong>kelompok rentan: anak di bawah 5 tahun</strong>"', badge: 'deep_dived', badgeColor: '#06b6d4' },
+    { key: 'Topik', val: '"<strong>komplikasi serius campak</strong>"', badge: 'deep_dived', badgeColor: '#06b6d4' },
+    { key: 'Topik', val: '"<strong>konteks wabah 2026: gap vaksinasi</strong>"', badge: 'deep_dived', badgeColor: '#06b6d4' },
+    { key: 'Topik', val: '"<strong>jadwal vaksin MMR</strong>"', badge: 'deep_dived', badgeColor: '#06b6d4' },
+    { key: 'Topik', val: '"<strong>perkembangan kasus: 14 provinsi</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik', val: '"<strong>program catch-up vaccination Kemenkes</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik', val: '"<strong>DKI Jakarta masuk zona aktif</strong>"', badge: 'introduced', badgeColor: '#818cf8' }
+  ];
+
+  const DEPTH_FINAL_USER_MEMORY = {
+    user_interest: ['Wabah Campak 2026', 'Vaksin MMR anak', 'Imunisasi rutin'],
+    preferred_verticals: ['detikNews', 'detikInet', 'detikHealth'],
+    archetype: 'concerned_parent',
+    behavioral_patterns: { depth_preference: 'depth', session_frequency: 'returning' },
+    contexts: {
+      health_context: JSON.stringify({ child_age: '~2 tahun', vaccination_status: 'incomplete' }),
+      return_pattern: 'Day 1 + Day 3 — confirmed returning user'
+    }
+  };
+
+  function buildProgressLogHtml(items, done) {
+    return items.map(item => {
+      const text   = done ? item.text  : item;
+      const badge  = done ? item.badge : 'introduced';
+      const color  = done ? item.color : '#818cf8';
+      return `<div style="display:flex;align-items:flex-start;gap:6px;padding:4px 0;border-bottom:1px solid #1a1a24;">
+        <span style="color:#34d399;font-size:11px;flex-shrink:0;margin-top:1px;">${done && badge === 'deep_dived' ? '↑' : '+'}</span>
+        <span style="font-size:10px;color:#aaa;flex:1;line-height:1.45;">${text}</span>
+        <span style="font-size:9px;padding:1px 5px;border-radius:6px;font-weight:700;flex-shrink:0;background:${color}22;color:${color}">${badge}</span>
+      </div>`;
+    }).join('');
+  }
+
+  async function runDepthScenario() {
+    const userQ = sessionStorage.getItem('detik_ai_first_query') || 'Masih bahaya nggak campaknya? Ada perkembangan baru?';
+    sessionStorage.removeItem('detik_ai_first_query');
+
+    if (welcomeEl) welcomeEl.style.display = 'none';
+    qpContainer.style.display = 'none';
+
+    // Set initial session memory with depth classification
+    sessionMemory.length = 0;
+    DEPTH_INITIAL_SESSION.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+
+    // wfBody shows pre-loaded progress log (all 5 concepts from previous session)
+    wfBody.innerHTML = `
+      <div style="background:#16161e;border:1px solid #1e1e2e;border-radius:8px;overflow:hidden;margin-bottom:4px;">
+        <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #1e1e2e;">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#34d399;flex:1;">Progress Log</span>
+          <span style="font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(52,211,153,0.12);color:#34d399;font-weight:700;">5 loaded</span>
+        </div>
+        <div style="padding:6px 8px;" id="progress-log-pre">
+          ${buildProgressLogHtml(DEPTH_PROGRESS_LOG_BEFORE, false)}
+        </div>
+      </div>`;
+    wfCount.textContent = '0';
+
+    addUserMsg(userQ);
+    addTyping();
+
+    // Animate workflow turn
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-depth"></div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    const wfStepsEl = document.getElementById('wf-steps-depth');
+
+    for (let i = 0; i < DEPTH_WORKFLOW_STEPS.length; i++) {
+      const s = DEPTH_WORKFLOW_STEPS[i];
+      const stepEl = document.createElement('div');
+      stepEl.className = 'wf-step active';
+      const isDepth    = /class 3|continuation|partition/i.test(s.label);
+      const isProgress = /progress log/i.test(s.label);
+      const color = isProgress ? '#34d399' : isDepth ? '#06b6d4' : '';
+      stepEl.innerHTML = `
+        <span class="step-dot"${color ? ` style="background:${color}"` : ''}></span>
+        <span class="step-label"${color ? ` style="color:${color};font-weight:600"` : ''}>${s.label}</span>
+        <span class="step-ms">${s.ms}ms</span>`;
+      wfStepsEl.appendChild(stepEl);
+      await new Promise(r => setTimeout(r, 250));
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+    }
+
+    removeTyping();
+    addBotMsg(formatReply(DEPTH_ANSWER), ['HealthBot · depth', 'detikHealth', 'Kemenkes RI', 'IDAI']);
+
+    // Update memory + progress log after answer
+    Object.assign(userMemory, DEPTH_FINAL_USER_MEMORY);
+    sessionMemory.length = 0;
+    DEPTH_FINAL_SESSION.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+
+    // Update progress log block to show deep_dived + new topics
+    const preLog = document.getElementById('progress-log-pre');
+    if (preLog) {
+      preLog.closest('div[style]').querySelector('[id]').closest('div[style]').querySelector('span:last-child').textContent = '8 entries';
+      preLog.innerHTML = buildProgressLogHtml(DEPTH_PROGRESS_LOG_AFTER, true);
+    }
+
+    totalTokens += Math.floor(DEPTH_ANSWER.length / 4) + 80;
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${Math.min(100, (totalTokens / 1024) * 100)}%`;
+  }
+
+  if (sessionStorage.getItem('detik_ai_scenario') === 'campak_depth') {
+    sessionStorage.removeItem('detik_ai_scenario');
+    setTimeout(runDepthScenario, 350);
+  }
+
+  // ── CAMPAK RESOLVED SCENARIO (class 3 + state change — vaccination confirmed) ──
+  const RESOLVED_ANSWER = `Bagus sekali — itu langkah yang tepat dan cepat.
+
+**Situasi Kirana sekarang:** Dosis pertama MMR memberikan perlindungan sekitar **93%** terhadap campak. Itu sudah signifikan — risiko Kirana turun drastis dibanding minggu lalu.
+
+**Yang perlu kamu tahu tentang dosis kedua:** Perlindungan penuh butuh dosis kedua, yang dijadwalkan di **usia 18 bulan**. Jangan lewatkan ini — dosis kedua mendorong perlindungan ke **97%** dan membangun imunitas jangka panjang.
+
+**Sisa risiko yang realistis:** Selama **2 minggu** setelah vaksinasi, tubuh Kirana masih membangun respons imun. Dalam periode ini, tetap hindari kerumunan besar dan perhatikan gejala awal jika ada paparan. Setelah 2 minggu, proteksinya sudah aktif penuh.
+
+**Wabahnya sendiri:** Kasus masih aktif di 14 provinsi. Tapi dengan dosis pertama, Kirana bukan lagi kelompok paling rentan. Kamu sudah melakukan bagian terpenting.`;
+
+  const RESOLVED_PROGRESS_LOG_LOADED = [
+    { text: '"transmisi dan tingkat penularan campak"',  badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"kelompok rentan: anak di bawah 5 tahun"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"komplikasi serius campak"',               badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"konteks wabah 2026: gap vaksinasi"',      badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"jadwal vaksin MMR"',                      badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"perkembangan kasus: 14 provinsi"',        badge: 'introduced', color: '#818cf8' },
+    { text: '"program catch-up vaccination Kemenkes"',  badge: 'introduced', color: '#818cf8' },
+    { text: '"DKI Jakarta masuk zona aktif"',           badge: 'introduced', color: '#818cf8' }
+  ];
+
+  const RESOLVED_PROGRESS_LOG_AFTER = [
+    { text: '"transmisi dan tingkat penularan campak"',  badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"kelompok rentan: anak di bawah 5 tahun"', badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"komplikasi serius campak"',               badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"konteks wabah 2026: gap vaksinasi"',      badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"jadwal vaksin MMR"',                      badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"perkembangan kasus: 14 provinsi"',        badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"program catch-up vaccination Kemenkes"',  badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"DKI Jakarta masuk zona aktif"',           badge: 'deep_dived', color: '#06b6d4' },
+    { text: '"efektivitas MMR dosis pertama (93%)"',    badge: 'introduced', color: '#818cf8' },
+    { text: '"window imunitas 2 minggu pasca vaksin"',  badge: 'introduced', color: '#818cf8' },
+    { text: '"jadwal MMR dosis kedua: usia 18 bulan"',  badge: 'introduced', color: '#818cf8' }
+  ];
+
+  const RESOLVED_WORKFLOW_STEPS = [
+    { label: 'Classify intent: Depth query (class 3) + state change', ms: 103 },
+    { label: 'Resolve entity: "Kirana" from user profile', ms: 88 },
+    { label: 'Detect contradiction: "sudah vaksin" vs stored "incomplete"', ms: 142 },
+    { label: 'Trigger profile update: vaccination_status → dose_1_complete', ms: 196 },
+    { label: 'Load progress log: 8 concepts from journey', ms: 112 },
+    { label: 'Score confidence: 0.91', ms: 78 },
+    { label: 'Retrieve MMR efficacy data (detikHealth)', ms: 267 },
+    { label: 'Generate reassurance + guidance answer', ms: 534 }
+  ];
+
+  const RESOLVED_INITIAL_SESSION = [
+    { key: 'Class',    val: 'Depth <strong>(class 3)</strong> — continuation + state change signal', badge: 'class 3', badgeColor: '#06b6d4' },
+    { key: 'Entities', val: '"<strong>Kirana</strong>" (person — resolved from profile)', badge: 'person', badgeColor: '#10b981' },
+    { key: 'Entities', val: '"<strong>sudah vaksin</strong>" (health status update)', badge: 'status update', badgeColor: '#f59e0b' },
+    { key: 'Entities', val: '"<strong>masih perlu khawatir</strong>" (safety concern)', badge: 'concern', badgeColor: '#818cf8' },
+    { key: 'Signal',   val: '"sudah vaksin" contradicts stored <strong>vaccination_status: "incomplete"</strong>', badge: 'profile update ↑', badgeColor: '#f59e0b' },
+    { key: 'Confidence', val: '0.91', badge: 'high', badgeColor: '#34d399' },
+    { key: 'Progress', val: 'extensive — 8 concepts loaded from journey', badge: 'loaded', badgeColor: '#34d399' }
+  ];
+
+  const RESOLVED_FINAL_SESSION = [
+    { key: 'Status',   val: 'vaccination_status updated → <strong>dose_1_complete</strong>', badge: 'resolved ✓', badgeColor: '#34d399' },
+    { key: 'Topik',    val: '"<strong>efektivitas MMR dosis pertama (93%)</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik',    val: '"<strong>window imunitas 2 minggu pasca vaksin</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Topik',    val: '"<strong>jadwal MMR dosis kedua: usia 18 bulan</strong>"', badge: 'introduced', badgeColor: '#818cf8' },
+    { key: 'Archetype', val: 'concerned_parent → shifting to <strong>informed_parent</strong>', badge: 'transitioning', badgeColor: '#10b981' }
+  ];
+
+  const RESOLVED_FINAL_USER_MEMORY = {
+    user_interest: ['Wabah Campak 2026', 'Vaksin MMR anak', 'Efektivitas vaksinasi', 'Jadwal imunisasi'],
+    preferred_verticals: ['detikNews', 'detikInet', 'detikHealth'],
+    archetype: 'informed_parent',
+    behavioral_patterns: { depth_preference: 'depth', session_frequency: 'returning' },
+    contexts: {
+      health_context: JSON.stringify({ child_age: '~2 tahun', vaccination_status: 'dose_1_complete', next_action: 'MMR dose 2 at 18 months' }),
+      archetype_transition: 'concerned_parent → informed_parent (vaccination confirmed)',
+      return_pattern: 'Day 1 + Day 3 + Day 5 — high engagement'
+    }
+  };
+
+  async function runResolvedScenario() {
+    const userQ = sessionStorage.getItem('detik_ai_first_query') || 'Kirana sudah vaksin kemarin. Masih perlu khawatir?';
+    sessionStorage.removeItem('detik_ai_first_query');
+
+    if (welcomeEl) welcomeEl.style.display = 'none';
+    qpContainer.style.display = 'none';
+
+    // Set initial session memory with state-change classification
+    sessionMemory.length = 0;
+    RESOLVED_INITIAL_SESSION.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+
+    // wfBody shows full pre-loaded progress log (8 concepts from journey)
+    wfBody.innerHTML = `
+      <div style="background:#16161e;border:1px solid #1e1e2e;border-radius:8px;overflow:hidden;margin-bottom:4px;">
+        <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid #1e1e2e;">
+          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#34d399;flex:1;">Progress Log</span>
+          <span id="plog-count-resolved" style="font-size:9px;padding:1px 6px;border-radius:8px;background:rgba(52,211,153,0.12);color:#34d399;font-weight:700;">8 loaded</span>
+        </div>
+        <div style="padding:6px 8px;" id="progress-log-resolved">
+          ${buildProgressLogHtml(RESOLVED_PROGRESS_LOG_LOADED, true)}
+        </div>
+      </div>`;
+    wfCount.textContent = '0';
+
+    addUserMsg(userQ);
+    addTyping();
+
+    // Show state-change signal pill before workflow starts
+    await new Promise(r => setTimeout(r, 300));
+    const pill = document.createElement('div');
+    pill.style.cssText = 'align-self:flex-start;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#f59e0b,#10b981);color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:999px;letter-spacing:0.3px;text-transform:uppercase;margin:4px 0 -2px 44px;box-shadow:0 2px 6px rgba(245,158,11,0.35);';
+    pill.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;"></span> profile update triggered';
+    document.getElementById('chat-messages').appendChild(pill);
+    document.getElementById('chat-messages').scrollTop = 99999;
+
+    // Animate workflow turn
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps" id="wf-steps-resolved"></div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+    const wfStepsEl = document.getElementById('wf-steps-resolved');
+
+    for (let i = 0; i < RESOLVED_WORKFLOW_STEPS.length; i++) {
+      const s = RESOLVED_WORKFLOW_STEPS[i];
+      const stepEl = document.createElement('div');
+      stepEl.className = 'wf-step active';
+      const isContra = /contradiction|profile update/i.test(s.label);
+      const isClass  = /class 3|continuation/i.test(s.label);
+      const isResolve = /resolve entity/i.test(s.label);
+      const color = isContra ? '#f59e0b' : isResolve ? '#10b981' : isClass ? '#06b6d4' : '';
+      stepEl.innerHTML = `
+        <span class="step-dot"${color ? ` style="background:${color}"` : ''}></span>
+        <span class="step-label"${color ? ` style="color:${color};font-weight:600"` : ''}>${s.label}</span>
+        <span class="step-ms">${s.ms}ms</span>`;
+      wfStepsEl.appendChild(stepEl);
+      await new Promise(r => setTimeout(r, 260));
+      stepEl.classList.remove('active');
+      stepEl.classList.add('done');
+    }
+
+    removeTyping();
+    addBotMsg(formatReply(RESOLVED_ANSWER), ['HealthBot · resolved', 'detikHealth', 'IDAI Imunisasi', 'Kemenkes RI']);
+
+    // Update memory + progress log after answer
+    Object.assign(userMemory, RESOLVED_FINAL_USER_MEMORY);
+    sessionMemory.length = 0;
+    RESOLVED_FINAL_SESSION.forEach(m => sessionMemory.push(m));
+    renderUserMemory();
+    renderSessionMemory();
+
+    // Expand progress log to 11 entries
+    const plogEl = document.getElementById('progress-log-resolved');
+    const plogCount = document.getElementById('plog-count-resolved');
+    if (plogEl) plogEl.innerHTML = buildProgressLogHtml(RESOLVED_PROGRESS_LOG_AFTER, true);
+    if (plogCount) plogCount.textContent = '11 entries';
+
+    totalTokens += Math.floor(RESOLVED_ANSWER.length / 4) + 80;
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${Math.min(100, (totalTokens / 1024) * 100)}%`;
+  }
+
+  if (sessionStorage.getItem('detik_ai_scenario') === 'campak_resolved') {
+    sessionStorage.removeItem('detik_ai_scenario');
+    setTimeout(runResolvedScenario, 350);
   }
 
 </script>
