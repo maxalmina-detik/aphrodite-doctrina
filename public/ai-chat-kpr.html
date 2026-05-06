@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>detik AI — Take Over KPR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #e8192c;
+      --red-dark: #c0121f;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --border: #e8e8e8;
+      --bg: #f4f4f6;
+      --white: #ffffff;
+      --sidebar-w: 280px;
+      --panel-w: 272px;
+    }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    .topbar {
+      background: var(--white);
+      border-bottom: 3px solid var(--red);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 20px;
+    }
+    .topbar .logo { font-size: 28px; font-weight: 900; color: var(--red); letter-spacing: -1px; flex-shrink: 0; }
+    .topbar .divider-v { width: 1px; height: 28px; background: var(--border); }
+    .topbar .ai-label { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--text); }
+    .ai-label .badge { background: var(--red); color: #fff; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 10px; letter-spacing: 0.5px; }
+    .topbar .back-link { margin-left: auto; font-size: 13px; color: var(--red); font-weight: 700; display: flex; align-items: center; gap: 4px; }
+    .topbar .back-link:hover { text-decoration: underline; }
+
+    .chat-layout { flex: 1; display: flex; overflow: hidden; }
+
+    .chat-sidebar {
+      width: var(--sidebar-w);
+      background: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sidebar-head { padding: 16px; border-bottom: 1px solid #2a2a2a; }
+    .new-chat-btn {
+      width: 100%; padding: 10px; background: var(--red); border: none; border-radius: 8px;
+      color: #fff; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.15s;
+    }
+    .new-chat-btn:hover { background: var(--red-dark); }
+    .sidebar-section-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: #555; padding: 14px 16px 6px;
+    }
+    .chat-history { flex: 1; overflow-y: auto; padding: 0 8px 8px; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+    .history-item {
+      padding: 9px 10px; border-radius: 6px; cursor: pointer;
+      display: flex; align-items: flex-start; gap: 8px;
+      color: #aaa; font-size: 12px; line-height: 1.4; transition: background 0.12s;
+    }
+    .history-item:hover { background: #252525; color: #fff; }
+    .history-item.active { background: #2a2a2a; color: #fff; }
+    .history-item .hi-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .history-item .hi-text { flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .history-item .hi-time { font-size: 10px; color: #444; flex-shrink: 0; margin-top: 2px; }
+
+    .sidebar-topics { border-top: 1px solid #2a2a2a; padding: 12px 8px; }
+    .topic-chip {
+      display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 6px;
+      font-size: 12px; color: #888; cursor: pointer; transition: background 0.12s, color 0.12s;
+    }
+    .topic-chip:hover { background: #252525; color: #fff; }
+    .topic-chip .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+    .chat-header {
+      padding: 14px 24px; background: var(--white); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .chat-header .ai-icon-wrap {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--red);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative;
+    }
+    .chat-header .ai-icon-wrap::after {
+      content: ''; position: absolute; bottom: 1px; right: 1px;
+      width: 10px; height: 10px; border-radius: 50%; background: #4ade80; border: 2px solid var(--white);
+    }
+    .chat-header .info h2 { font-size: 15px; font-weight: 900; }
+    .chat-header .info p { font-size: 11px; color: var(--muted); }
+    .chat-header .actions { margin-left: auto; display: flex; gap: 8px; }
+    .icon-btn {
+      width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border);
+      background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--muted); font-size: 15px; transition: border-color 0.15s, color 0.15s;
+    }
+    .icon-btn:hover { border-color: var(--red); color: var(--red); }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 24px;
+      display: flex; flex-direction: column; gap: 20px;
+      scrollbar-width: thin; scrollbar-color: #ddd transparent;
+    }
+
+    .msg-row { display: flex; gap: 10px; max-width: 780px; animation: msgSlide 0.2s ease both; }
+    @keyframes msgSlide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
+    .msg-row.bot  { align-self: flex-start; }
+    .msg-avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 14px; margin-top: 2px;
+    }
+    .msg-row.bot .msg-avatar { background: var(--red); }
+    .msg-row.user .msg-avatar { background: #1a1a1a; color: #fff; font-size: 12px; font-weight: 700; }
+
+    .msg-content { display: flex; flex-direction: column; gap: 4px; }
+    .msg-sender { font-size: 11px; color: var(--muted); font-weight: 700; }
+    .msg-row.user .msg-sender { text-align: right; }
+    .msg-bubble {
+      padding: 12px 16px; border-radius: 14px; font-size: 14px; line-height: 1.65; max-width: 600px;
+      overflow-x: auto;
+    }
+    .msg-row.bot .msg-bubble { background: var(--white); border: 1px solid var(--border); border-top-left-radius: 4px; color: var(--text); }
+    .msg-row.user .msg-bubble { background: var(--red); color: #fff; border-top-right-radius: 4px; }
+    .msg-bubble strong { font-weight: 700; }
+    .msg-bubble p { margin-bottom: 8px; }
+    .msg-bubble p:last-child { margin-bottom: 0; }
+    .msg-bubble ol { padding-left: 20px; margin: 8px 0; }
+    .msg-bubble ul { padding-left: 18px; margin: 6px 0; }
+    .msg-bubble li { margin-bottom: 6px; line-height: 1.6; }
+    .msg-time { font-size: 10px; color: #ccc; margin-top: 2px; }
+    .msg-row.user .msg-time { text-align: right; color: #bbb; }
+
+    .msg-sources { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .source-pill {
+      display: flex; align-items: center; gap: 5px; background: #f0f0f4;
+      border: 1px solid var(--border); border-radius: 12px; padding: 3px 10px;
+      font-size: 11px; color: var(--muted); cursor: pointer; transition: background 0.12s;
+    }
+    .source-pill:hover { background: #e8e8f0; color: var(--red); }
+    .source-pill .sp-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+
+    .typing-indicator {
+      display: flex; align-items: center; gap: 4px; padding: 12px 16px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 14px; border-top-left-radius: 4px; width: fit-content;
+    }
+    .typing-indicator span {
+      width: 7px; height: 7px; border-radius: 50%; background: #ccc;
+      animation: typingDot 1.2s ease infinite;
+    }
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingDot {
+      0%, 60%, 100% { transform: translateY(0); background: #ccc; }
+      30% { transform: translateY(-5px); background: var(--red); }
+    }
+
+    .chat-input-area { padding: 16px 24px 20px; background: var(--white); border-top: 1px solid var(--border); flex-shrink: 0; }
+    .chat-input-wrap { max-width: 780px; margin: 0 auto; }
+    .input-row {
+      display: flex; gap: 10px; background: var(--bg); border: 2px solid var(--border);
+      border-radius: 14px; padding: 6px 6px 6px 16px; transition: border-color 0.15s;
+    }
+    .input-row:focus-within { border-color: var(--red); }
+    #main-chat-input {
+      flex: 1; border: none; background: none; outline: none;
+      font-size: 14px; font-family: inherit; color: var(--text);
+      padding: 6px 0; resize: none; max-height: 120px;
+    }
+    #main-chat-input::placeholder { color: #aaa; }
+    .input-actions { display: flex; align-items: flex-end; gap: 6px; }
+    #main-send-btn {
+      width: 38px; height: 38px; border-radius: 10px; background: var(--red);
+      border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, transform 0.1s; flex-shrink: 0;
+    }
+    #main-send-btn:hover { background: var(--red-dark); }
+    #main-send-btn:active { transform: scale(0.95); }
+    #main-send-btn:disabled { background: #ddd; cursor: not-allowed; }
+    .input-hint { font-size: 11px; color: #bbb; margin-top: 8px; text-align: center; }
+
+    .quick-prompts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .qp-btn {
+      background: var(--white); border: 1px solid var(--border); border-radius: 16px;
+      padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: inherit; color: var(--muted); transition: border-color 0.12s, color 0.12s; white-space: nowrap;
+    }
+    .qp-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* RIGHT MEMORY PANEL */
+    .memory-panel {
+      width: var(--panel-w); background: #0f0f13; flex-shrink: 0;
+      display: flex; flex-direction: column; overflow: hidden;
+      border-left: 1px solid #1e1e28; font-family: 'Lato', sans-serif;
+    }
+    .mp-header {
+      padding: 14px 16px 12px; border-bottom: 1px solid #1e1e28;
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .mp-header .mp-title { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #888; flex: 1; }
+    .mp-header .mp-live { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #555; }
+    .mp-header .mp-live::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%; background: #4ade80;
+      animation: livepulse 1.8s ease infinite;
+    }
+    @keyframes livepulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .mp-body {
+      flex: 1; overflow-y: auto; padding: 12px;
+      display: flex; flex-direction: column; gap: 12px;
+      scrollbar-width: thin; scrollbar-color: #222 transparent;
+    }
+    .mp-section { background: #16161e; border: 1px solid #1e1e2e; border-radius: 10px; overflow: hidden; }
+    .mp-section-head {
+      display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+      border-bottom: 1px solid #1e1e2e; cursor: pointer; user-select: none;
+    }
+    .mp-section-head .sec-icon { width: 20px; height: 20px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+    .mp-section-head .sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; flex: 1; }
+    .mp-section-head .sec-count { font-size: 10px; padding: 1px 6px; border-radius: 8px; font-weight: 700; }
+    .mp-section-head .sec-toggle { font-size: 10px; color: #444; transition: transform 0.2s; }
+    .mp-section.collapsed .sec-toggle { transform: rotate(-90deg); }
+    .mp-section.collapsed .mp-section-body { display: none; }
+    .mp-section-body { padding: 8px 10px; }
+
+    .mp-section.user-mem .sec-icon { background: rgba(232,25,44,0.15); }
+    .mp-section.user-mem .sec-label { color: #e8192c; }
+    .mp-section.user-mem .sec-count { background: rgba(232,25,44,0.15); color: #e8192c; }
+    .mp-section.session-mem .sec-icon { background: rgba(99,102,241,0.15); }
+    .mp-section.session-mem .sec-label { color: #818cf8; }
+    .mp-section.session-mem .sec-count { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .mp-section.workflow .sec-icon { background: rgba(16,185,129,0.12); }
+    .mp-section.workflow .sec-label { color: #34d399; }
+    .mp-section.workflow .sec-count { background: rgba(16,185,129,0.12); color: #34d399; }
+
+    .mem-item {
+      display: flex; gap: 7px; align-items: flex-start; padding: 5px 0;
+      border-bottom: 1px solid #1a1a24; animation: fadeItem 0.3s ease both;
+    }
+    .mem-item:last-child { border-bottom: none; }
+    @keyframes fadeItem { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: translateX(0); } }
+    .mem-item .mi-key { font-size: 10px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.4px; min-width: 56px; flex-shrink: 0; padding-top: 1px; }
+    .mem-item .mi-val { font-size: 11px; color: #bbb; line-height: 1.5; flex: 1; }
+    .mem-item .mi-val strong { color: #e8e8f0; font-weight: 700; }
+    .mem-item .mi-badge { font-size: 9px; padding: 1px 5px; border-radius: 6px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+
+    .wf-turn {
+      position: relative; padding: 6px 0 6px 16px;
+      border-bottom: 1px solid #1a1a24; animation: fadeItem 0.3s ease both;
+    }
+    .wf-turn:last-child { border-bottom: none; }
+    .wf-turn::before { content: ''; position: absolute; left: 5px; top: 0; bottom: 0; width: 1px; background: #2a2a3a; }
+    .wf-turn::after {
+      content: ''; position: absolute; left: 2px; top: 12px;
+      width: 7px; height: 7px; border-radius: 50%; background: #34d399; border: 1px solid #0f0f13;
+    }
+    .wf-turn:first-child::after { background: var(--red); }
+    .wf-turn .wf-turn-num { font-size: 9px; color: #444; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .wf-turn .wf-steps { display: flex; flex-direction: column; gap: 3px; }
+    .wf-step { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #777; }
+    .wf-step .step-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+    .wf-step.done .step-dot { background: #34d399; }
+    .wf-step.done { color: #999; }
+    .wf-step .step-label { flex: 1; }
+    .wf-step .step-ms { font-size: 9px; color: #444; font-family: monospace; }
+
+    .mp-empty { text-align: center; padding: 14px 10px; font-size: 11px; color: #333; font-style: italic; }
+
+    .mp-footer {
+      border-top: 1px solid #1e1e28; padding: 10px 14px;
+      display: flex; flex-direction: column; gap: 5px; flex-shrink: 0;
+    }
+    .token-row { display: flex; justify-content: space-between; align-items: center; font-size: 10px; }
+    .token-row .tk-label { color: #444; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+    .token-row .tk-val { color: #666; font-family: monospace; }
+    .token-bar-wrap { height: 3px; background: #1e1e28; border-radius: 2px; overflow: hidden; }
+    .token-bar { height: 100%; background: linear-gradient(90deg, #818cf8, #34d399); border-radius: 2px; transition: width 0.4s ease; }
+
+    /* User Memory JSON */
+    .um-json {
+      font-family: 'Courier New', monospace;
+      font-size: 10px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #777;
+    }
+    .um-json .jp { color: #555; }
+    .um-json .jk { color: #818cf8; }
+    .um-json .js { color: #34d399; }
+    .um-json .jc { color: #f59e0b; }
+    .um-json .je { color: #555; }
+
+    /* Follow-up buttons */
+    .kpr-followups {
+      max-width: 780px; align-self: flex-start; margin-left: 44px;
+      display: flex; flex-direction: column; gap: 8px; animation: msgSlide 0.3s ease both;
+    }
+    .kpr-followups .fu-label { font-size: 11px; color: #888; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+    .fu-btn {
+      display: flex; align-items: center; gap: 10px; background: #fff;
+      border: 1.5px solid #e8e8e8; border-radius: 10px; padding: 10px 14px;
+      font-family: inherit; font-size: 13px; color: #1a1a1a; cursor: pointer;
+      text-align: left; line-height: 1.45; transition: all 0.15s;
+    }
+    .fu-btn:hover { border-color: #e8192c; background: #fff5f5; transform: translateX(3px); }
+    .fu-num {
+      width: 22px; height: 22px; border-radius: 50%; background: #818cf8;
+      color: #fff; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .fu-text { flex: 1; }
+    .fu-arrow { color: #818cf8; font-size: 18px; font-weight: 700; }
+
+    .demo-toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: #1a1a1a; color: #fff; padding: 10px 18px; border-radius: 24px;
+      font-size: 12px; font-family: 'Lato', sans-serif; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+      z-index: 99999; animation: toastIn 0.3s ease both;
+    }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+    /* Simulation table */
+    .sim-table {
+      width: 100%; border-collapse: collapse; margin: 10px 0 6px; font-size: 12.5px;
+      border-radius: 8px; overflow: hidden; border: 1px solid #e8e8e8;
+    }
+    .sim-table thead tr { background: #f4f4f6; }
+    .sim-table th {
+      font-size: 10px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: 0.4px; color: #888; padding: 7px 12px;
+      border-bottom: 1px solid #e8e8e8; text-align: left;
+    }
+    .sim-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+    .sim-table tr:last-child td { border-bottom: none; }
+    .sim-table .col-label { font-size: 12px; color: #555; font-weight: 700; }
+    .sim-table .col-curr { color: #6b6b6b; }
+    .sim-table .col-new  { color: #059669; font-weight: 700; }
+    .sim-table .savings-row td { background: #f0fdf4; }
+    .sim-table .savings-val { color: #059669; font-size: 15px; font-weight: 900; }
+    .sim-table .savings-empty { color: #ccc; font-size: 14px; text-align: center; }
+    .sim-section-label {
+      font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #999; margin-top: 14px; margin-bottom: 4px;
+    }
+
+    /* Orchestrator dispatch pill */
+    .orch-pill {
+      align-self: flex-start;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(90deg, #4f46e5, #818cf8);
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 5px 13px; border-radius: 999px;
+      letter-spacing: 0.3px; text-transform: uppercase;
+      margin: 4px 0 -2px 44px;
+      box-shadow: 0 2px 8px rgba(129,140,248,0.4);
+    }
+    .orch-pill-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: #fff; flex-shrink: 0;
+      animation: orchpulse 1.2s ease-in-out infinite;
+    }
+    @keyframes orchpulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.75); } }
+    .orch-bot-tags { display: inline-flex; gap: 5px; margin-left: 2px; }
+    .orch-bot-tag {
+      background: rgba(255,255,255,0.2); border-radius: 6px;
+      padding: 1px 6px; font-size: 9px; font-weight: 900; letter-spacing: 0.3px;
+    }
+
+    /* Process steps (turn 3) */
+    .process-steps { display: flex; flex-direction: column; margin: 10px 0 4px; }
+    .process-step { display: flex; gap: 14px; padding: 10px 0; }
+    .process-step:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
+    .step-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; width: 26px; }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 50%; background: #818cf8;
+      color: #fff; font-size: 11px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .step-connector { flex: 1; width: 1px; background: #ececec; margin: 4px 0; min-height: 12px; }
+    .step-body { flex: 1; padding-top: 2px; }
+    .step-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .step-title { font-size: 13px; font-weight: 700; color: #1a1a1a; }
+    .step-duration {
+      font-size: 10px; font-weight: 700; color: #818cf8;
+      background: rgba(129,140,248,0.1); border-radius: 6px;
+      padding: 1px 7px; white-space: nowrap;
+    }
+    .step-desc { font-size: 12.5px; color: #555; line-height: 1.6; }
+    .step-desc strong { color: #1a1a1a; }
+    .process-note {
+      background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px;
+      padding: 10px 14px; margin-top: 10px; font-size: 12.5px; line-height: 1.6; color: #92400e;
+    }
+    .process-note strong { color: #78350f; }
+  </style>
+  <link rel="stylesheet" href="/brand/brand.css" />
+  <link rel="stylesheet" href="/brand/chat-overrides.css" />
+  <link rel="icon" href="/brand/detikcom.png" />
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="index.html" class="logo">detik</a>
+    <div class="divider-v"></div>
+    <div class="ai-label">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="#e8192c" stroke-width="1.5"/>
+        <path d="M8 10h8M8 14h5" stroke="#e8192c" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21" stroke="#e8192c" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      detik AI
+      <span class="badge">BETA</span>
+    </div>
+    <a href="index.html" class="back-link">&#8592; Kembali ke Beranda</a>
+  </div>
+</div>
+
+<!-- CHAT LAYOUT -->
+<div class="chat-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="chat-sidebar">
+    <div class="sidebar-head">
+      <button class="new-chat-btn" id="new-chat-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+          <path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        Chat Baru
+      </button>
+    </div>
+
+    <div class="sidebar-section-label">Riwayat Hari Ini</div>
+    <div class="chat-history">
+      <div class="history-item active">
+        <span class="hi-icon">💵</span>
+        <span class="hi-text">Take Over KPR</span>
+        <span class="hi-time">baru saja</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Simulasi KPR 20 tahun</span>
+        <span class="hi-time">1 jam lalu</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Perbandingan bank KPR 2026</span>
+        <span class="hi-time">3 jam lalu</span>
+      </div>
+      <div class="sidebar-section-label" style="padding-left:0;">Kemarin</div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">Analisis merger Gojek-Grab</span>
+        <span class="hi-time">kemarin</span>
+      </div>
+      <div class="history-item">
+        <span class="hi-icon">💬</span>
+        <span class="hi-text">IHSG & Rupiah terkini</span>
+        <span class="hi-time">kemarin</span>
+      </div>
+    </div>
+
+    <div class="sidebar-topics">
+      <div class="sidebar-section-label" style="padding: 0 0 8px;">Topik Cepat</div>
+      <div class="topic-chip" data-q="Apa tips membeli rumah pertama di 2026?">
+        <span class="dot" style="background:#818cf8;"></span> Beli Rumah
+      </div>
+      <div class="topic-chip" data-q="Bagaimana cara menghitung cicilan KPR?">
+        <span class="dot" style="background:#f59e0b;"></span> Simulasi KPR
+      </div>
+      <div class="topic-chip" data-q="Bagaimana kondisi pasar properti Indonesia saat ini?">
+        <span class="dot" style="background:#10b981;"></span> Pasar Properti
+      </div>
+      <div class="topic-chip" data-q="Apa perbedaan KPR subsidi dan non-subsidi?">
+        <span class="dot" style="background:#e8192c;"></span> KPR Subsidi
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <div class="chat-main">
+
+    <div class="chat-header">
+      <div class="ai-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+          <path d="M9 10h6M9 14h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 2v2M12 20v2M2 12h2M20 12h2" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="info">
+        <h2>detik AI — PropertiBot</h2>
+        <p>Panduan properti & KPR — didukung konten detikProperti</p>
+      </div>
+      <div class="actions">
+        <button class="icon-btn" title="Bagikan" onclick="alert('Fitur berbagi segera hadir!')">&#10548;</button>
+        <button class="icon-btn" title="Hapus chat" id="clear-chat-btn">&#128465;</button>
+      </div>
+    </div>
+
+    <div class="chat-messages" id="chat-messages"></div>
+
+    <div class="chat-input-area">
+      <div class="chat-input-wrap">
+        <div class="quick-prompts" id="quick-prompts" style="display:none;">
+          <button class="qp-btn" data-q="Berapa estimasi biaya take over KPR?">💰 Biaya take over</button>
+          <button class="qp-btn" data-q="Bank mana yang rate KPR-nya paling kompetitif?">🏦 Rate terbaik</button>
+          <button class="qp-btn" data-q="Bagaimana cara menghitung penghematan dari take over KPR?">📊 Hitung penghematan</button>
+        </div>
+        <div class="input-row">
+          <textarea id="main-chat-input" placeholder="Tanyakan sesuatu tentang properti & KPR..." rows="1"></textarea>
+          <div class="input-actions">
+            <button id="main-send-btn" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p class="input-hint">detik AI dapat membuat kesalahan. Selalu konsultasikan keputusan KPR dengan bank atau konsultan keuangan.</p>
+      </div>
+    </div>
+
+  </div><!-- /chat-main -->
+
+  <!-- RIGHT MEMORY PANEL -->
+  <aside class="memory-panel">
+    <div class="mp-header">
+      <span class="mp-title">AI Context</span>
+      <span class="mp-live">Live</span>
+    </div>
+    <div class="mp-body">
+
+      <div class="mp-section user-mem" id="mp-user-mem">
+        <div class="mp-section-head" onclick="toggleSection(this)">
+          <div class="sec-icon">🧠</div>
+          <span class="sec-label">User Memory</span>
+          <span class="sec-count" id="um-count">0</span>
+          <span class="sec-toggle">▾</span>
+        </div>
+        <div class="mp-section-body" id="um-body">
+          <div class="mp-empty">Belum ada memori tersimpan</div>
+        </div>
+      </div>
+
+      <div class="mp-section session-mem" id="mp-session-mem">
+        <div class="mp-section-head" onclick="toggleSection(this)">
+          <div class="sec-icon">💾</div>
+          <span class="sec-label">Session Memory</span>
+          <span class="sec-count" id="sm-count">0</span>
+          <span class="sec-toggle">▾</span>
+        </div>
+        <div class="mp-section-body" id="sm-body">
+          <div class="mp-empty">Sesi baru dimulai</div>
+        </div>
+      </div>
+
+      <div class="mp-section workflow" id="mp-workflow">
+        <div class="mp-section-head" onclick="toggleSection(this)">
+          <div class="sec-icon">🔀</div>
+          <span class="sec-label">Workflow Route</span>
+          <span class="sec-count" id="wf-count">0</span>
+          <span class="sec-toggle">▾</span>
+        </div>
+        <div class="mp-section-body" id="wf-body">
+          <div class="mp-empty">Belum ada percakapan</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="mp-footer">
+      <div class="token-row">
+        <span class="tk-label">Token digunakan</span>
+        <span class="tk-val" id="token-used">0 / 1024</span>
+      </div>
+      <div class="token-bar-wrap">
+        <div class="token-bar" id="token-bar" style="width:0%"></div>
+      </div>
+      <div class="token-row" style="margin-top:2px;">
+        <span class="tk-label">Turns</span>
+        <span class="tk-val" id="turn-count-val">0</span>
+        <span class="tk-label" style="margin-left:12px;">Model</span>
+        <span class="tk-val">haiku-4-5</span>
+      </div>
+    </div>
+  </aside>
+
+</div><!-- /chat-layout -->
+
+<script>
+  const msgsEl      = document.getElementById('chat-messages');
+  const inputEl     = document.getElementById('main-chat-input');
+  const sendBtn     = document.getElementById('main-send-btn');
+  const newChatBtn  = document.getElementById('new-chat-btn');
+  const clearBtn    = document.getElementById('clear-chat-btn');
+  const qpContainer = document.getElementById('quick-prompts');
+
+  const umBody     = document.getElementById('um-body');
+  const smBody     = document.getElementById('sm-body');
+  const wfBody     = document.getElementById('wf-body');
+  const umCount    = document.getElementById('um-count');
+  const smCount    = document.getElementById('sm-count');
+  const wfCount    = document.getElementById('wf-count');
+  const tokenUsed  = document.getElementById('token-used');
+  const tokenBar   = document.getElementById('token-bar');
+  const turnCountEl= document.getElementById('turn-count-val');
+
+  let isTyping = false;
+  let turnCount = 0;
+  let totalTokens = 0;
+
+  const userMemory = {
+    user_interest: [],
+    preferred_verticals: ['detikNews'],
+    archetype: 'Pembaca berita umum detik.com',
+    contexts: {}
+  };
+  const sessionMemory = [];
+
+  function now() { return new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); }
+
+  function toggleSection(head) { head.closest('.mp-section').classList.toggle('collapsed'); }
+  window.toggleSection = toggleSection;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function jsonStr(v) {
+    if (v === '' || v == null) return '<span class="je">""</span>';
+    return `<span class="js">"${escapeHtml(v)}"</span>`;
+  }
+  function jsonArr(arr) {
+    if (!arr || !arr.length) return '<span class="jp">[]</span>';
+    return '<span class="jp">[</span>' + arr.map(jsonStr).join('<span class="jp">, </span>') + '<span class="jp">]</span>';
+  }
+
+  function renderUserMemory() {
+    const um = userMemory;
+    const ctxKeys = Object.keys(um.contexts || {});
+    const ctxBody = ctxKeys.length
+      ? ctxKeys.map((k, i) => `    <span class="jk">"${escapeHtml(k)}"</span><span class="jp">:</span> ${jsonStr(um.contexts[k])}${i < ctxKeys.length - 1 ? '<span class="jp">,</span>' : ''}`).join('\n')
+      : '';
+    const ctx = ctxKeys.length ? `<span class="jc">{</span>\n${ctxBody}\n  <span class="jc">}</span>` : '<span class="jc">{}</span>';
+
+    const bp = um.behavioral_patterns || {};
+    const bpKeys = Object.keys(bp);
+    const bpBody = bpKeys.length
+      ? bpKeys.map((k, i) => `    <span class="jk">"${escapeHtml(k)}"</span><span class="jp">:</span> ${jsonStr(bp[k])}${i < bpKeys.length - 1 ? '<span class="jp">,</span>' : ''}`).join('\n')
+      : '';
+    const bpJson = bpKeys.length ? `<span class="jc">{</span>\n${bpBody}\n  <span class="jc">}</span>` : '<span class="jc">{}</span>';
+    const bpLine = bpKeys.length ? `\n  <span class="jk">"behavioral_patterns"</span><span class="jp">:</span> ${bpJson}<span class="jp">,</span>` : '';
+
+    const count = (um.user_interest?.length ? 1 : 0) + (um.preferred_verticals?.length ? 1 : 0) +
+                  (um.archetype ? 1 : 0) + (bpKeys.length ? 1 : 0) + ctxKeys.length;
+    umCount.textContent = count;
+
+    umBody.innerHTML = `<pre class="um-json"><span class="jp">{</span>
+  <span class="jk">"user_interest"</span><span class="jp">:</span> ${jsonArr(um.user_interest)}<span class="jp">,</span>
+  <span class="jk">"preferred_verticals"</span><span class="jp">:</span> ${jsonArr(um.preferred_verticals)}<span class="jp">,</span>
+  <span class="jk">"archetype"</span><span class="jp">:</span> ${jsonStr(um.archetype)}<span class="jp">,</span>${bpLine}
+  <span class="jk">"contexts"</span><span class="jp">:</span> ${ctx}
+<span class="jp">}</span></pre>`;
+  }
+
+  function renderSessionMemory() {
+    smCount.textContent = sessionMemory.length;
+    if (!sessionMemory.length) { smBody.innerHTML = '<div class="mp-empty">Sesi baru dimulai</div>'; return; }
+    smBody.innerHTML = sessionMemory.map(m => `
+      <div class="mem-item">
+        <span class="mi-key">${m.key}</span>
+        <span class="mi-val">${m.val}</span>
+        ${m.badge ? `<span class="mi-badge" style="background:${m.badgeColor}22;color:${m.badgeColor}">${m.badge}</span>` : ''}
+      </div>`).join('');
+  }
+
+  function addWorkflowTurn(steps) {
+    turnCount++;
+    wfCount.textContent = turnCount;
+    turnCountEl.textContent = turnCount;
+    const empty = wfBody.querySelector('.mp-empty');
+    if (empty) empty.remove();
+
+    const turn = document.createElement('div');
+    turn.className = 'wf-turn';
+    turn.innerHTML = `
+      <div class="wf-turn-num">Turn ${turnCount} · ${now()}</div>
+      <div class="wf-steps">
+        ${steps.map(s => `
+          <div class="wf-step done">
+            <span class="step-dot"></span>
+            <span class="step-label">${s.label}</span>
+            <span class="step-ms">${s.ms}ms</span>
+          </div>`).join('')}
+      </div>`;
+    wfBody.insertBefore(turn, wfBody.firstChild);
+  }
+
+  function updateTokens(len) {
+    const added = Math.floor(len / 4) + 40;
+    totalTokens = Math.min(totalTokens + added, 1024);
+    tokenUsed.textContent = `${totalTokens} / 1024`;
+    tokenBar.style.width = `${(totalTokens / 1024) * 100}%`;
+  }
+
+  function addUserMsg(text) {
+    const row = document.createElement('div');
+    row.className = 'msg-row user';
+    row.innerHTML = `
+      <div class="msg-avatar">Anda</div>
+      <div class="msg-content">
+        <div class="msg-sender">Anda</div>
+        <div class="msg-bubble">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>
+        <div class="msg-time">${now()}</div>
+      </div>`;
+    msgsEl.appendChild(row);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function addBotMsg(html, sources) {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    const sourcesHtml = sources?.length
+      ? `<div class="msg-sources">${sources.map(s => `<span class="source-pill"><span class="sp-dot"></span>${s}</span>`).join('')}</div>` : '';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+          <path d="M9 10h6M9 14h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="msg-content">
+        <div class="msg-sender">detik AI · PropertiBot</div>
+        <div class="msg-bubble">${html}</div>
+        ${sourcesHtml}
+        <div class="msg-time">${now()}</div>
+      </div>`;
+    msgsEl.appendChild(row);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function addTyping() {
+    const row = document.createElement('div');
+    row.className = 'msg-row bot';
+    row.id = 'typing-row';
+    row.innerHTML = `
+      <div class="msg-avatar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="8" stroke="white" stroke-width="1.5"/>
+          <path d="M9 10h6M9 14h4" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="msg-content">
+        <div class="msg-sender">detik AI · PropertiBot</div>
+        <div class="typing-indicator"><span></span><span></span><span></span></div>
+      </div>`;
+    msgsEl.appendChild(row);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+  }
+
+  function removeTyping() { const el = document.getElementById('typing-row'); if (el) el.remove(); }
+
+  // ── KPR Scenario constants ──
+  const KPR_QUESTION = 'Kapan waktu terbaik untuk take over KPR?';
+
+  const KPR_SESSION_MEMORY = [
+    { key: 'Intent',    val: 'Vertical query (class 1) → <strong>PropertiBot</strong>', badge: 'class 1', badgeColor: '#10b981' },
+    { key: 'Entitas',   val: '"<strong>take over KPR</strong>" (topic)', badge: 'topic', badgeColor: '#818cf8' },
+    { key: 'Entitas',   val: '"<strong>waktu terbaik</strong>" (decision signal)', badge: 'signal', badgeColor: '#818cf8' },
+    { key: 'Orches.',   val: 'Single bot — no orchestrator needed yet', badge: 'direct route', badgeColor: '#6b7280' },
+    { key: 'Partition', val: 'New partition opened: topic "<strong>Take Over KPR</strong>"', badge: 'new', badgeColor: '#34d399' },
+    { key: 'Conf.',     val: '0.86 → proceeds', badge: 'high', badgeColor: '#34d399' },
+    { key: 'Retrieval', val: 'PropertiBot retrieves detikProperti guidance content', badge: 'retrieved', badgeColor: '#10b981' }
+  ];
+
+  const KPR_WORKFLOW_STEPS = [
+    { label: 'Query received → intent router', ms: 88 },
+    { label: 'Classify intent: Vertical query (class 1)', ms: 112 },
+    { label: 'Route to PropertiBot vertical', ms: 76 },
+    { label: 'Extract entities: take over KPR, waktu terbaik', ms: 184 },
+    { label: 'Open new partition: "Take Over KPR"', ms: 134 },
+    { label: 'Retrieve detikProperti guidance content', ms: 362 },
+    { label: 'Score confidence: 0.86', ms: 98 },
+    { label: 'Generate property-grounded answer', ms: 541 }
+  ];
+
+  const KPR_FINAL_USER_MEMORY = {
+    user_interest: ['Take Over KPR', 'Refinancing', 'Perencanaan keuangan properti'],
+    preferred_verticals: ['detikNews', 'detikProperti'],
+    archetype: 'property_researcher',
+    behavioral_patterns: { decision_mode: 'financial_planning' },
+    contexts: {
+      property_interest: 'Take over KPR — timing & conditions'
+    }
+  };
+
+  const KPR_ANSWER = `<p>Take over KPR paling <em>worth it</em> dilakukan ketika <strong>tiga kondisi ini terpenuhi secara bersamaan</strong>:</p>
+<ol>
+  <li><strong>Selisih rate signifikan</strong><br>Idealnya minimal <strong>1–1,5%</strong> antara rate KPR lamamu dan rate terbaik yang ditawarkan bank baru. Di bawah itu, penghematan cicilan sering kali tidak cukup menutup biaya proses take over.</li>
+  <li><strong>Sisa tenor masih panjang</strong><br>Take over paling menguntungkan ketika kamu masih punya <strong>10 tahun atau lebih</strong>. Semakin panjang sisa tenor, semakin besar total penghematan bunga yang bisa kamu dapat.</li>
+  <li><strong>Kondisi keuanganmu stabil</strong><br>Bank baru akan mengevaluasi ulang kemampuan finansialmu — penghasilan, DTI <em>(debt-to-income ratio)</em>, dan rekam jejak cicilan. Pastikan semuanya dalam kondisi baik sebelum mengajukan.</li>
+</ol>
+<p><strong>Biaya yang perlu diperhitungkan:</strong> biaya appraisal, biaya notaris, provisi bank baru, dan penalti pelunasan dipercepat dari bank lama (jika masih dalam periode tertentu).</p>`;
+
+  const KPR_FOLLOWUPS = [
+    'Simulasikan take over KPR untuk situasiku',
+    'Bank mana yang rate KPR-nya paling kompetitif sekarang?',
+    'Berapa penalti pelunasan dipercepat yang biasanya dikenakan?'
+  ];
+
+  // ── Turn 2: complex multi-bot simulation ──
+  const KPR_TURN2_QUESTION = 'Simulasikan buat aku dong. KPR-ku dari 2019, cicilan Rp 4.2 juta per bulan, sisa tenor 16 tahun. Worthit nggak kalau take over sekarang?';
+
+  const KPR_TURN2_SESSION_MEMORY = [
+    { key: 'Intent',    val: 'Complex multi-vertical (class 3) → <strong>Orchestrator</strong>', badge: 'class 3', badgeColor: '#818cf8' },
+    { key: 'Entitas',   val: '"<strong>KPR 2019</strong>" (temporal), "<strong>Rp 4.2jt</strong>" (financial)', badge: '4 entities', badgeColor: '#818cf8' },
+    { key: 'Entitas',   val: '"<strong>16 tahun</strong>" (tenor), "<strong>sekarang</strong>" (time signal)', badge: 'extracted', badgeColor: '#818cf8' },
+    { key: 'Dispatch',  val: '<strong>PropertiBot</strong> · simulate KPR numbers', badge: '1 / 3', badgeColor: '#10b981' },
+    { key: 'Dispatch',  val: '<strong>FinanceBot</strong> · current bank rates', badge: '2 / 3', badgeColor: '#f59e0b' },
+    { key: 'Dispatch',  val: '<strong>NewsBot</strong> · BI rate direction', badge: '3 / 3', badgeColor: '#06b6d4' },
+    { key: 'Synth.',    val: 'Orchestrator merges 3 bot responses', badge: 'done', badgeColor: '#34d399' },
+    { key: 'User ctx',  val: 'Doni · 2 anak · cash flow optimization', badge: 'personalized', badgeColor: '#e8192c' }
+  ];
+
+  const KPR_TURN2_WORKFLOW_STEPS = [
+    { label: 'Classify: Complex multi-vertical (class 3)', ms: 134 },
+    { label: 'Orchestrator: dispatch 3 bots in parallel', ms: 88 },
+    { label: 'PropertiBot: simulate KPR numbers', ms: 412 },
+    { label: 'FinanceBot: fetch current bank rates', ms: 384 },
+    { label: 'NewsBot: retrieve BI rate signal & outlook', ms: 356 },
+    { label: 'Extract user context: Doni, 2 anak', ms: 112 },
+    { label: 'Orchestrator: merge 3 bot results', ms: 198 },
+    { label: 'Score coherence & confidence', ms: 142 },
+    { label: 'Generate consolidated recommendation', ms: 621 }
+  ];
+
+  const KPR_TURN2_FINAL_USER_MEMORY = {
+    user_interest: ['Take Over KPR', 'Refinancing', 'Perencanaan keuangan properti', 'Rate KPR terbaik', 'Timing take over'],
+    preferred_verticals: ['detikFinance', 'detikNews', 'detikProperti'],
+    archetype: 'practical_decision_maker',
+    behavioral_patterns: { decision_mode: 'financial_planning', session_frequency: 'returning' },
+    contexts: {
+      property_interest: 'Take over KPR — timing & conditions',
+      'property_context.take_over_intent': 'active · KPR 2019 · Rp 4.2jt/bln · sisa 16thn',
+      user_name: 'Doni',
+      family_context: '2 anak · cash flow optimization priority'
+    }
+  };
+
+  const KPR_TURN2_ANSWER = `
+<p>Aku sudah simulasikan situasi <strong>Doni</strong>. Ini hasilnya:</p>
+<p><strong>Simulasi Take Over KPR</strong><br><span style="font-size:11px;color:#888;">Sisa pokok estimasi: Rp 380 juta · Sisa tenor: 16 tahun</span></p>
+<table class="sim-table">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Rate sekarang (12.5%)</th>
+      <th>Setelah take over (10.25%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="col-label">Cicilan/bulan</td>
+      <td class="col-curr">Rp 4.200.000</td>
+      <td class="col-new">Rp 3.520.000</td>
+    </tr>
+    <tr>
+      <td class="col-label">Total bunga 16 thn</td>
+      <td class="col-curr">Rp 282 juta</td>
+      <td class="col-new">Rp 228 juta</td>
+    </tr>
+    <tr class="savings-row">
+      <td class="col-label"><strong>Penghematan</strong></td>
+      <td class="savings-empty">—</td>
+      <td class="savings-val">Rp 54 juta</td>
+    </tr>
+  </tbody>
+</table>
+<p>Penghematan cicilan bulanan: sekitar <strong>Rp 680 ribu</strong>.<br>
+<span style="font-size:12px;color:#555;">Biaya take over yang perlu disiapkan — Appraisal + notaris + provisi: estimasi <strong>Rp 12–18 juta</strong>. Break even point ada di sekitar <strong>18–26 bulan</strong> — setelah itu, semua penghematan jadi keuntungan murni.</span></p>
+<div class="sim-section-label">Rate terbaik saat ini</div>
+<p><strong>BCA menawarkan 10.25% fixed 2 tahun</strong> — selisih 2.25% dari rate Doni sekarang. Itu jauh di atas threshold 1.5% yang biasanya jadi patokan kelayakan take over.</p>
+<div class="sim-section-label">Soal timing — haruskah sekarang atau tunggu?</div>
+<p>Bank Indonesia baru saja menahan suku bunga di <strong>6.25%</strong> dan memberi sinyal stabil hingga H1 2026. Analis memperkirakan ada 1–2 pemangkasan di H2 2026 — artinya rate KPR berpotensi turun sedikit lagi sekitar Q3–Q4 tahun ini.</p>
+<div class="sim-section-label">Rekomendasiku</div>
+<p>Dengan sisa tenor 16 tahun dan selisih rate 2.25%, <strong>take over KPR worth it untuk Doni</strong>. Tapi ada dua pilihan:</p>
+<p><strong>Opsi 1 — Take over sekarang:</strong> Langsung hemat Rp 680 ribu/bulan mulai 2–3 bulan ke depan. Total penghematan Rp 54 juta. Cocok kalau <em>cash flow</em> ketat dan penghematan bulanan lebih penting dari menunggu rate yang sedikit lebih baik.</p>
+<p><strong>Opsi 2 — Tunggu Q3 2026:</strong> Berpotensi dapat rate 9.75–10% kalau BI memangkas. Tapi kamu melewatkan 6 bulan penghematan — sekitar <strong>Rp 4 juta yang terlewat</strong>. Dan tidak ada jaminan bank langsung menurunkan rate KPR mengikuti BI.</p>
+<p>Mengingat situasi Doni dengan dua anak dan <em>cash flow</em> yang perlu dioptimalkan, <strong>Opsi 1 lebih masuk akal</strong>. Penghematan Rp 680 ribu per bulan yang pasti lebih berharga dari mengejar selisih rate yang tidak pasti.</p>`;
+
+  const KPR_TURN2_FOLLOWUPS = [
+    'Bagaimana proses pengajuan take over KPR ke BCA?',
+    'Dokumen apa saja yang perlu aku siapkan?',
+    'Apakah ada penalti dari bank lamaku kalau take over sekarang?'
+  ];
+
+  function showOrchPill() {
+    const pill = document.createElement('div');
+    pill.className = 'orch-pill';
+    pill.innerHTML = `
+      <span class="orch-pill-dot"></span>
+      Orchestrator · 3 bot parallel dispatch
+      <span class="orch-bot-tags">
+        <span class="orch-bot-tag">Properti</span>
+        <span class="orch-bot-tag">Finance</span>
+        <span class="orch-bot-tag">News</span>
+      </span>`;
+    msgsEl.appendChild(pill);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    return pill;
+  }
+
+  async function runKprTurn2() {
+    if (isTyping) return;
+    isTyping = true;
+    sendBtn.disabled = true;
+
+    // Remove existing follow-up container
+    const existing = msgsEl.querySelector('.kpr-followups');
+    if (existing) existing.remove();
+
+    // User message
+    addUserMsg(KPR_TURN2_QUESTION);
+    await new Promise(r => setTimeout(r, 250));
+
+    // Orchestrator pill
+    const orchPill = showOrchPill();
+    await new Promise(r => setTimeout(r, 400));
+
+    // Update session memory for multi-bot
+    sessionMemory.length = 0;
+    KPR_TURN2_SESSION_MEMORY.forEach(m => sessionMemory.push(m));
+    renderSessionMemory();
+
+    // Typing
+    addTyping();
+    await new Promise(r => setTimeout(r, 2400));
+    removeTyping();
+
+    // Fade out orch pill
+    orchPill.style.transition = 'opacity 0.4s';
+    orchPill.style.opacity = '0.3';
+
+    // Answer
+    addBotMsg(KPR_TURN2_ANSWER, ['detikProperti', 'detikFinance', 'detikNews']);
+
+    // Workflow
+    addWorkflowTurn(KPR_TURN2_WORKFLOW_STEPS);
+
+    // Update user memory
+    Object.assign(userMemory, KPR_TURN2_FINAL_USER_MEMORY);
+    renderUserMemory();
+    updateTokens(KPR_TURN2_ANSWER.length + KPR_TURN2_QUESTION.length);
+
+    // Follow-ups for turn 2
+    await new Promise(r => setTimeout(r, 400));
+    renderKprTurn2FollowUps();
+
+    isTyping = false;
+    sendBtn.disabled = inputEl.value.trim().length === 0;
+  }
+
+  function renderKprTurn2FollowUps() {
+    const container = document.createElement('div');
+    container.className = 'kpr-followups';
+    container.innerHTML = `
+      <div class="fu-label">Tanya lanjutan:</div>
+      ${KPR_TURN2_FOLLOWUPS.map((q, i) => `
+        <button class="fu-btn" data-idx="${i}">
+          <span class="fu-num">${i + 1}</span>
+          <span class="fu-text">${q}</span>
+          <span class="fu-arrow">›</span>
+        </button>
+      `).join('')}
+    `;
+    msgsEl.appendChild(container);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    container.querySelectorAll('.fu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        if (idx === 0) {
+          runKprTurn3();
+        } else {
+          const t = document.createElement('div');
+          t.className = 'demo-toast';
+          t.textContent = 'Pilih "Bagaimana proses pengajuan take over KPR ke BCA?" untuk melanjutkan demo';
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 2400);
+        }
+      });
+    });
+  }
+
+  function renderKprFollowUps() {
+    const container = document.createElement('div');
+    container.className = 'kpr-followups';
+    container.innerHTML = `
+      <div class="fu-label">Tanya lanjutan:</div>
+      ${KPR_FOLLOWUPS.map((q, i) => `
+        <button class="fu-btn" data-idx="${i}">
+          <span class="fu-num">${i + 1}</span>
+          <span class="fu-text">${q}</span>
+          <span class="fu-arrow">›</span>
+        </button>
+      `).join('')}
+    `;
+    msgsEl.appendChild(container);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    container.querySelectorAll('.fu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.dataset.idx);
+        if (idx === 0) {
+          // First follow-up triggers turn 2
+          runKprTurn2();
+        } else {
+          const t = document.createElement('div');
+          t.className = 'demo-toast';
+          t.textContent = 'Pilih "Simulasikan take over KPR" untuk melanjutkan demo';
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 2200);
+        }
+      });
+    });
+  }
+
+  async function runKprScenario() {
+    isTyping = true;
+    sendBtn.disabled = true;
+
+    // Step 1: show user message
+    addUserMsg(KPR_QUESTION);
+
+    // Step 2: populate session memory immediately
+    sessionMemory.length = 0;
+    KPR_SESSION_MEMORY.forEach(m => sessionMemory.push(m));
+    renderSessionMemory();
+
+    // Step 3: typing indicator
+    await new Promise(r => setTimeout(r, 300));
+    addTyping();
+
+    // Step 4: wait, then show answer
+    await new Promise(r => setTimeout(r, 1800));
+    removeTyping();
+    addBotMsg(KPR_ANSWER, ['detikProperti', 'detikFinance']);
+
+    // Step 5: add workflow
+    addWorkflowTurn(KPR_WORKFLOW_STEPS);
+
+    // Step 6: update user memory
+    Object.assign(userMemory, KPR_FINAL_USER_MEMORY);
+    renderUserMemory();
+    updateTokens(KPR_ANSWER.length + KPR_QUESTION.length);
+
+    // Step 7: follow-up hooks
+    await new Promise(r => setTimeout(r, 400));
+    renderKprFollowUps();
+
+    isTyping = false;
+    sendBtn.disabled = inputEl.value.trim().length === 0;
+  }
+
+  // ── Turn 3: process guide (single-bot, partition continues) ──
+  const KPR_TURN3_QUESTION = 'Bagaimana proses pengajuan take over KPR ke BCA?';
+
+  const KPR_TURN3_SESSION_MEMORY = [
+    { key: 'Intent',    val: 'Vertical query (class 1) → <strong>PropertiBot</strong>', badge: 'class 1', badgeColor: '#10b981' },
+    { key: 'Routing',   val: 'Single bot — process question, no orchestration needed', badge: 'direct', badgeColor: '#6b7280' },
+    { key: 'Partition', val: 'Active partition "<strong>Take Over KPR</strong>" continues', badge: 'active', badgeColor: '#34d399' },
+    { key: 'Retrieval', val: 'PropertiBot: <strong>Panduan Beli Jual &amp; Sewa</strong>', badge: 'retrieved', badgeColor: '#10b981' },
+    { key: 'Retrieval', val: 'PropertiBot: <strong>Panduan Hukum Properti</strong>', badge: 'retrieved', badgeColor: '#10b981' },
+    { key: 'Conf.',     val: '0.89 → proceeds', badge: 'high', badgeColor: '#34d399' }
+  ];
+
+  const KPR_TURN3_WORKFLOW_STEPS = [
+    { label: 'Classify intent: Vertical query (class 1)', ms: 94 },
+    { label: 'Route to PropertiBot (single bot)', ms: 72 },
+    { label: 'Match active partition: "Take Over KPR"', ms: 88 },
+    { label: 'Retrieve: Panduan Beli Jual & Sewa', ms: 298 },
+    { label: 'Retrieve: Panduan Hukum Properti', ms: 264 },
+    { label: 'Score confidence: 0.89', ms: 112 },
+    { label: 'Generate process guide answer', ms: 476 }
+  ];
+
+  const KPR_TURN3_ANSWER = `
+<p>Proses take over KPR ke bank baru umumnya memakan waktu <strong>4–8 minggu</strong>. Ini tahapannya:</p>
+<div class="process-steps">
+  <div class="process-step">
+    <div class="step-left">
+      <div class="step-num">1</div>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step-body">
+      <div class="step-head">
+        <span class="step-title">Persiapan dokumen</span>
+        <span class="step-duration">1–2 minggu</span>
+      </div>
+      <div class="step-desc">Kumpulkan: <strong>KTP + KK</strong>, slip gaji 3 bulan terakhir, rekening koran 3 bulan, <strong>sertifikat rumah</strong> (asli di bank lama), IMB, PBB terakhir, dan surat keterangan <em>outstanding</em> KPR dari bank lama.</div>
+    </div>
+  </div>
+  <div class="process-step">
+    <div class="step-left">
+      <div class="step-num">2</div>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step-body">
+      <div class="step-head">
+        <span class="step-title">Pengajuan ke BCA</span>
+        <span class="step-duration">1 minggu</span>
+      </div>
+      <div class="step-desc">Submit dokumen ke cabang BCA atau melalui <em>relationship manager</em> KPR. BCA akan melakukan verifikasi awal dan memberi <strong>Letter of Offer</strong> jika lolos <em>screening</em>.</div>
+    </div>
+  </div>
+  <div class="process-step">
+    <div class="step-left">
+      <div class="step-num">3</div>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step-body">
+      <div class="step-head">
+        <span class="step-title">Appraisal</span>
+        <span class="step-duration">1–2 minggu</span>
+      </div>
+      <div class="step-desc">BCA akan mengirim tim <em>appraisal</em> untuk menilai ulang propertimu. Nilai <em>appraisal</em> menentukan berapa maksimal KPR yang bisa diambil alih.</div>
+    </div>
+  </div>
+  <div class="process-step">
+    <div class="step-left">
+      <div class="step-num">4</div>
+    </div>
+    <div class="step-body">
+      <div class="step-head">
+        <span class="step-title">Akad dan pelunasan</span>
+        <span class="step-duration">1–2 minggu</span>
+      </div>
+      <div class="step-desc">Setelah semua disetujui, dilakukan <strong>akad kredit baru</strong> di hadapan notaris. BCA akan melunasi sisa KPR ke bank lamamu, dan cicilan baru mulai berjalan bulan berikutnya.</div>
+    </div>
+  </div>
+</div>
+<div class="process-note">⚠️ <strong>Yang perlu dicek sebelum mulai:</strong> Hubungi bank lamamu untuk konfirmasi apakah ada penalti pelunasan dipercepat dan berapa besarnya. Ini harus masuk dalam kalkulasi total biaya take over.</div>`;
+
+  const KPR_TURN3_FOLLOWUPS = [
+    'Dokumen apa saja yang perlu aku siapkan?',
+    'Apakah ada penalti dari bank lamaku kalau take over sekarang?'
+  ];
+
+  async function runKprTurn3() {
+    if (isTyping) return;
+    isTyping = true;
+    sendBtn.disabled = true;
+
+    const existing = msgsEl.querySelector('.kpr-followups');
+    if (existing) existing.remove();
+
+    addUserMsg(KPR_TURN3_QUESTION);
+    await new Promise(r => setTimeout(r, 250));
+
+    // Update session memory (replace with turn 3 state)
+    sessionMemory.length = 0;
+    KPR_TURN3_SESSION_MEMORY.forEach(m => sessionMemory.push(m));
+    renderSessionMemory();
+
+    addTyping();
+    await new Promise(r => setTimeout(r, 1600));
+    removeTyping();
+
+    addBotMsg(KPR_TURN3_ANSWER, ['detikProperti']);
+    addWorkflowTurn(KPR_TURN3_WORKFLOW_STEPS);
+    updateTokens(KPR_TURN3_ANSWER.length + KPR_TURN3_QUESTION.length);
+
+    await new Promise(r => setTimeout(r, 400));
+    renderKprTurn3FollowUps();
+
+    isTyping = false;
+    sendBtn.disabled = inputEl.value.trim().length === 0;
+  }
+
+  function renderKprTurn3FollowUps() {
+    const container = document.createElement('div');
+    container.className = 'kpr-followups';
+    container.innerHTML = `
+      <div class="fu-label">Tanya lanjutan:</div>
+      ${KPR_TURN3_FOLLOWUPS.map((q, i) => `
+        <button class="fu-btn">
+          <span class="fu-num">${i + 1}</span>
+          <span class="fu-text">${q}</span>
+          <span class="fu-arrow">›</span>
+        </button>
+      `).join('')}
+    `;
+    msgsEl.appendChild(container);
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+    container.querySelectorAll('.fu-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = document.createElement('div');
+        t.className = 'demo-toast';
+        t.textContent = 'Demo berakhir di sini — hanya 3 turn yang dijalankan';
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2200);
+      });
+    });
+  }
+
+  // ── General send (free typing after scenario) ──
+  async function sendMessage(text) {
+    if (!text.trim() || isTyping) return;
+    isTyping = true;
+    sendBtn.disabled = true;
+    addUserMsg(text);
+    addTyping();
+    await new Promise(r => setTimeout(r, 1200));
+    removeTyping();
+    addBotMsg('<p>Pertanyaan bagus! Untuk demo ini, hanya skenario "Kapan waktu terbaik untuk take over KPR?" yang dijalankan secara penuh. Silakan kembali ke beranda untuk mencoba topik lain.</p>');
+    const steps = [
+      { label: 'Intent classified: General query', ms: 102 },
+      { label: 'PropertiBot handles query', ms: 198 },
+      { label: 'Generate answer', ms: 421 }
+    ];
+    addWorkflowTurn(steps);
+    updateTokens(text.length + 80);
+    isTyping = false;
+    sendBtn.disabled = inputEl.value.trim().length === 0;
+  }
+
+  // Input events
+  inputEl.addEventListener('input', function () {
+    sendBtn.disabled = this.value.trim().length === 0 || isTyping;
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const val = this.value.trim();
+      this.value = '';
+      this.style.height = 'auto';
+      sendBtn.disabled = true;
+      sendMessage(val);
+    }
+  });
+  sendBtn.addEventListener('click', () => {
+    const val = inputEl.value.trim();
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+    sendMessage(val);
+  });
+
+  document.querySelectorAll('.topic-chip').forEach(el => {
+    el.addEventListener('click', () => sendMessage(el.dataset.q || el.textContent.trim()));
+  });
+
+  newChatBtn.addEventListener('click', () => {
+    turnCount = 0; totalTokens = 0;
+    document.querySelectorAll('.msg-row, .kpr-followups').forEach(el => el.remove());
+    inputEl.value = '';
+    sendBtn.disabled = true;
+    sessionMemory.length = 0;
+    renderSessionMemory();
+    wfBody.innerHTML = '<div class="mp-empty">Belum ada percakapan</div>';
+    wfCount.textContent = '0';
+    turnCountEl.textContent = '0';
+    tokenUsed.textContent = '0 / 1024';
+    tokenBar.style.width = '0%';
+    Object.assign(userMemory, { user_interest: [], preferred_verticals: ['detikNews'], archetype: 'Pembaca berita umum detik.com', contexts: {} });
+    delete userMemory.behavioral_patterns;
+    renderUserMemory();
+  });
+  clearBtn.addEventListener('click', () => { if (confirm('Hapus semua pesan di sesi ini?')) newChatBtn.click(); });
+
+  // Init
+  renderUserMemory();
+  renderSessionMemory();
+
+  // Auto-run KPR scenario if routed from widget
+  const storedScenario = sessionStorage.getItem('detik_ai_scenario');
+  if (storedScenario === 'cicilan_kpr') {
+    sessionStorage.removeItem('detik_ai_scenario');
+    sessionStorage.removeItem('detik_ai_first_query');
+    setTimeout(runKprScenario, 400);
+  }
+</script>
+</body>
+</html>
